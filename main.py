@@ -25,10 +25,10 @@ def main():
     ram = RAM(1024)
     cpu = CPU(ram)
 
-    instrucciones = load_instructions("data/test_instructions.txt")
+    instrucciones = load_instructions("data/test_totales.txt")
 
     print(
-        f"\n[+] {len(instrucciones)} bytes cargados desde instructions.txt: {instrucciones}"
+        f"\n[+] {len(instrucciones)} bytes cargados desde test_totales.txt: {instrucciones}"
     )
 
     print("[+] Cargando instrucciones en RAM desde dirección 0x0000...")
