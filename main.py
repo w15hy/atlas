@@ -39,10 +39,10 @@ def show_menu():
 
 def main():
 
-    ram = RAM(1024)
+    ram = RAM(6048)
     cpu = CPU(ram)
 
-    instrucciones = load_instructions("data/euclides.txt")
+    instrucciones = load_instructions("data/instructions.txt")
 
     print(
         f"\n[+] {len(instrucciones)} bytes cargados desde euclides.txt: {instrucciones}"
@@ -61,26 +61,28 @@ def main():
     if modo == "1":
         # Modo 1: Ejecución completa
         cpu.run_all()
-    
+
     elif modo == "2":
         # Modo 2: Paso a paso manual
         cpu.run_step_manual()
-    
+
     elif modo == "3":
         # Modo 3: Paso a paso con delay
         try:
-            delay_input = input("\n¿Cuál es el delay entre instrucciones (en segundos)? [1.0]: ").strip()
+            delay_input = input(
+                "\n¿Cuál es el delay entre instrucciones (en segundos)? [1.0]: "
+            ).strip()
             delay = float(delay_input) if delay_input else 1.0
-            
+
             if delay < 0:
                 print("[!] El delay no puede ser negativo. Usando 1.0 segundos.")
                 delay = 1.0
-            
+
             cpu.run_step_timed(delay)
         except ValueError:
             print("[!] Entrada inválida. Usando delay de 1.0 segundo.")
             cpu.run_step_timed(1.0)
-    
+
     else:
         print("[!] Opción no reconocida. Usando ejecución completa.")
         cpu.run_all()
