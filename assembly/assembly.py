@@ -258,23 +258,73 @@ def encode_f4(opcode, keywords):
 
 ENCODERS = {1: encode_f1, 2: encode_f2, 3: encode_f3, 4: encode_f4}
 
-for linea in sys.stdin:
-    if linea.startswith("#") or linea.strip() == "":
-        continue
 
-    partes   = re.split(r"[ ,]+", linea.strip())
-    instr    = partes[0].lower()
-    keywords = [p for p in partes[1:] if p]
+def main():
+    if len(sys.argv) < 2:
+        print("Uso: python assembly.py <archivo_asm> [archivo_salida]")
+        print()
+        print("Argumentos:")
+        print("  archivo_asm   : Archivo con instrucciones (una por línea)")
+        print("  archivo_salida: Archivo para guardar bytecode (opcional)")
+        print()
+        print("Ejemplo:")
+        print("  python assembly.py programa.asm")
+        print("  python assembly.py programa.asm programa.bin")
+        sys.exit(1)
+    
+    input_file = sys.argv[1]
+    output_file = sys.argv[2] if len(sys.argv) > 2 else None
+    
+    try:
+        with open(input_file, 'r') as f:
+            lineas = f.readlines()
+    except FileNotFoundError:
+        print(f"error: archivo '{input_file}' no encontrado")
+        sys.exit(1)
+    except Exception as e:
+        print(f"error al leer '{input_file}': {e}")
+        sys.exit(1)
+    
+    # Procesar instrucciones
+    resultados = []
+    for num_linea, linea in enumerate(lineas, 1):
+        if linea.startswith("#") or linea.strip() == "":
+            continue
 
-    if instr not in instr_dict:
-        print(f"error: instrucción desconocida '{instr}'")
-        continue
+        partes   = re.split(r"[ ,]+", linea.strip())
+        instr    = partes[0].lower()
+        keywords = [p for p in partes[1:] if p]
 
-    info    = instr_dict[instr]
-    formato = info["formato"]
-    opcode  = info["opcode"]
+        if instr not in instr_dict:
+            print(f"[Línea {num_linea}] error: instrucción desconocida '{instr}'")
+            continue
 
-    encoder = ENCODERS[formato]
-    bits    = encoder(opcode, keywords)
+        info    = instr_dict[instr]
+        formato = info["formato"]
+        opcode  = info["opcode"]
 
-    print(f"{instr:6}  {bits}")
+        encoder = ENCODERS[formato]
+        bits    = encoder(opcode, keywords)
+
+        resultado = f"{instr:6}  {bits}"
+        resultados.append(resultado)
+        print(resultado)
+    
+    # Guardar en archivo si se especificó
+    if output_file:
+        try:
+            with open(output_file, 'w') as f:
+                for resultado in resultados:
+                    # Extraer solo los bits (después del nombre de instrucción)
+                    bits = resultado.split()[-1]
+                    # Escribir byte por byte (8 bits por línea)
+                    for i in range(0, len(bits), 8):
+                        f.write(bits[i:i+8] + '\n')
+            print(f"\n✓ Bytecode guardado en '{output_file}'")
+        except Exception as e:
+            print(f"\nerror al escribir '{output_file}': {e}")
+            sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

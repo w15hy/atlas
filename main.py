@@ -42,7 +42,7 @@ def main():
     ram = RAM(6048)
     cpu = CPU(ram)
 
-    instrucciones = load_instructions("data/instructions.txt")
+    instrucciones = load_instructions("data/ejemplobin.txt")
 
     print(
         f"\n[+] {len(instrucciones)} bytes cargados desde euclides.txt: {instrucciones}"
