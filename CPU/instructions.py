@@ -1,29 +1,27 @@
 """
+instructions.py — Implementación de instrucciones (versión corregida)
+=====================================================================
+Cambios respecto a la versión original:
+  • store : convierte int→string de 8 bits antes de escribir en RAM
+  • push  : usa write_block de 8 bytes; SP -= 8
+  • pop   : usa read_block de 8 bytes; SP += 8
+  • call  : guarda PC+8 (dirección de retorno real) en 8 bytes del stack
+  • ret   : restaura PC desde 8 bytes del stack  (NUEVO — F4 opcode 3)
+  • iret  : idéntico a ret para interrupciones    (NUEVO — F4 opcode 4)
+  • inti  : corregido (guarda PC+8 en stack como string binario)
+
 Layouts de instrucción (todos 64 bits):
 
 F1  [ pre(4) ][ opcode(10) ][ modo(6) ][ rd(4) ][ r1(4) ][ r2(4) ][ inm(32) ]
-     0        4             14         20        24        28        32        64
-
 F2  [ pre(4) ][ opcode(8)  ][ modo(6) ][ r1(4) ][ base(4) ][ index(4) ][ scale(2) ][ offset(32) ]
-     0        4             12         18        22          26           30           32           64
-
 F3  [ pre(4) ][ opcode(10) ][ modo(6) ][ r1(4) ][ r2(4) ][ offset(32) ][ flags(4) ]
-     0        4             14         20        24        28             60          64
-
 F4  [ pre(4) ][ opcode(6)  ][ modo(6) ][ inm32(32) ][ padding(16) ]
-     0        4             10         16             48             64
 """
 
+ADDR_MASK = (1 << 32) - 1
 
-# ---------------------------------------------------------------------------
-# Helpers de parseo
-# ---------------------------------------------------------------------------
 
 def _parse_fmt1(registros):
-    """
-    F1: [ pre(4) ][ opcode(10) ][ modo(6) ][ rd(4) ][ r1(4) ][ r2(4) ][ inm(32) ]
-    Retorna (modo, rd, r1, r2, inm)
-    """
     ir   = registros.IR
     modo = int(ir[14:20], 2)
     rd   = int(ir[20:24], 2)
@@ -34,10 +32,6 @@ def _parse_fmt1(registros):
 
 
 def _parse_fmt2(registros):
-    """
-    F2: [ pre(4) ][ opcode(8) ][ modo(6) ][ r1(4) ][ base(4) ][ index(4) ][ scale(2) ][ offset(32) ]
-    Retorna (modo, r1, base, index, scale, offset)
-    """
     ir     = registros.IR
     modo   = int(ir[12:18], 2)
     r1     = int(ir[18:22], 2)
@@ -49,10 +43,6 @@ def _parse_fmt2(registros):
 
 
 def _parse_fmt3(registros):
-    """
-    F3: [ pre(4) ][ opcode(10) ][ modo(6) ][ r1(4) ][ r2(4) ][ offset(32) ][ flags(4) ]
-    Retorna (modo, r1, r2, offset, flags)
-    """
     ir     = registros.IR
     modo   = int(ir[14:20], 2)
     r1     = int(ir[20:24], 2)
@@ -63,87 +53,97 @@ def _parse_fmt3(registros):
 
 
 def _parse_fmt4(registros):
-    """
-    F4: [ pre(4) ][ opcode(6) ][ modo(6) ][ inm32(32) ][ padding(16) ]
-    Retorna (modo, inm32)
-    """
     ir    = registros.IR
     modo  = int(ir[10:16], 2)
     inm32 = int(ir[16:48], 2)
     return modo, inm32
 
 
-# ---------------------------------------------------------------------------
-# Cálculo de dirección de salto (F3)
-# ---------------------------------------------------------------------------
+def _int_to_bin64(value: int) -> str:
+    """Entero → cadena binaria de 64 bits (complemento a 2)."""
+    return format(value & 0xFFFFFFFFFFFFFFFF, '064b')
+
 
 def _jump_target(registros, modo, r1, r2, offset):
-    """
-    modo 0 → absoluto   (offset es la dirección)
-    modo 1 → relativo   (PC + offset con signo)
-    modo 2 → por registro r1
-    modo 3 → branch     (PC + offset, igual que relativo por ahora)
-    modo 4 → branch con dos registros (r1 + r2)
-    """
     if modo == 0:
-        return offset
+        return offset & ADDR_MASK
     elif modo == 1:
-        return registros.PC + offset
+        return (registros.PC + offset) & ADDR_MASK
     elif modo == 2:
-        return registros.get_reg(r1)
+        return registros.get_reg(r1) & ADDR_MASK
     elif modo == 3:
-        return registros.PC + offset
+        return (registros.PC + offset) & ADDR_MASK
     elif modo == 4:
-        return registros.get_reg(r1) + registros.get_reg(r2)
-    return offset
+        return (registros.get_reg(r1) + registros.get_reg(r2)) & ADDR_MASK
+    return offset & ADDR_MASK
 
 
 # ---------------------------------------------------------------------------
-# Instrucciones F4 — control
+# F4 — Control
 # ---------------------------------------------------------------------------
 
 def nop(cpu, registros, ram):
-    pass
+    return False
 
 
 def halt(cpu, registros, ram):
     cpu.running = False
+    return False
 
 
 def inti(cpu, registros, ram):
     _, inm32 = _parse_fmt4(registros)
-    registros.SP -= 1
-    ram.write(registros.SP, registros.PC)
-    registros.PC = cpu.interrupt_table[inm32]
+    ret_addr = registros.PC + 8
+    registros.SP -= 8
+    ram.write_block(registros.SP, _int_to_bin64(ret_addr))
+    registros.PC = cpu.interrupt_table.get(inm32, registros.PC)
     return True
 
 
+def ret(cpu, registros, ram):
+    """
+    Retorna de subrutina: lee 8 bytes del stack → PC; SP += 8.
+    NUEVO — F4 opcode 3.
+    """
+    data = ram.read_block(registros.SP, 8)
+    registros.SP += 8
+    registros.PC = int(data, 2) & ADDR_MASK
+    return True
+
+
+def iret(cpu, registros, ram):
+    """Retorno de interrupción (igual a ret). NUEVO — F4 opcode 4."""
+    return ret(cpu, registros, ram)
+
+
 # ---------------------------------------------------------------------------
-# Instrucciones F1 — registro / inmediato
+# F1 — Registro / Inmediato
 # ---------------------------------------------------------------------------
 
 def mov(cpu, registros, ram):
     modo, rd, r1, r2, inm = _parse_fmt1(registros)
-    if modo == 1:                              # registro - inmediato
+    if modo == 1:
         registros.set_reg(rd, inm)
-    else:                                      # registro - registro (modo 2)
+    else:
         registros.set_reg(rd, registros.get_reg(r1))
     return False
 
 
 def push(cpu, registros, ram):
+    """Apila 8 bytes (valor de 64 bits); SP -= 8. CORRECCIÓN: usaba 1 byte."""
     _, rd, _, _, _ = _parse_fmt1(registros)
     val = registros.get_reg(rd)
-    registros.SP -= 1
-    ram.write(registros.SP, val)
+    registros.SP -= 8
+    ram.write_block(registros.SP, _int_to_bin64(val))
     return False
 
 
 def pop(cpu, registros, ram):
+    """Desapila 8 bytes del stack al registro; SP += 8. CORRECCIÓN: usaba 1 byte."""
     _, rd, _, _, _ = _parse_fmt1(registros)
-    val = ram.read(registros.SP)
-    registros.SP += 1
-    registros.set_reg(rd, val)
+    data = ram.read_block(registros.SP, 8)
+    registros.SP += 8
+    registros.set_reg(rd, int(data, 2))
     return False
 
 
@@ -334,9 +334,9 @@ def cmp(cpu, registros, ram):
     _, rd, r1, _, _ = _parse_fmt1(registros)
     vd, v1 = registros.get_reg(rd), registros.get_reg(r1)
     result = vd - v1
-    registros.flag_Z = result == 0
-    registros.flag_N = result < 0
-    registros.flag_C = vd < v1
+    registros.flag_Z = (result == 0)
+    registros.flag_N = (result < 0)
+    registros.flag_C = (vd < v1)
     return False
 
 
@@ -349,24 +349,33 @@ def test(cpu, registros, ram):
 
 
 # ---------------------------------------------------------------------------
-# Instrucciones F2 — memoria
+# F2 — Memoria
 # ---------------------------------------------------------------------------
 
 def load(cpu, registros, ram):
+    """Carga 1 byte de la RAM al registro (bits[7:0])."""
     _, r1, base, index, scale, offset = _parse_fmt2(registros)
-    addr = registros.get_reg(base) + registros.get_reg(index) * scale + offset
-    registros.set_reg(r1, ram.read(addr))
+    addr     = registros.get_reg(base) + registros.get_reg(index) * scale + offset
+    byte_str = ram.read(addr)           # string '01001010'
+    registros.set_reg(r1, int(byte_str, 2))
     return False
 
 
 def store(cpu, registros, ram):
+    """
+    Almacena 1 byte del registro en la RAM.
+    CORRECCIÓN: el original pasaba un int a ram.write(), que requiere
+    string binario de exactamente 8 bits.
+    """
     _, r1, base, index, scale, offset = _parse_fmt2(registros)
     addr = registros.get_reg(base) + registros.get_reg(index) * scale + offset
-    ram.write(addr, registros.get_reg(r1))
+    val  = registros.get_reg(r1) & 0xFF        # tomar solo los 8 bits bajos
+    ram.write(addr, format(val, '08b'))         # '01001010'
     return False
 
 
 def lea(cpu, registros, ram):
+    """Load Effective Address: r1 = base + index*scale + offset."""
     _, r1, base, index, scale, offset = _parse_fmt2(registros)
     addr = registros.get_reg(base) + registros.get_reg(index) * scale + offset
     registros.set_reg(r1, addr)
@@ -374,7 +383,7 @@ def lea(cpu, registros, ram):
 
 
 # ---------------------------------------------------------------------------
-# Instrucciones F3 — saltos
+# F3 — Saltos
 # ---------------------------------------------------------------------------
 
 def jmp(cpu, registros, ram):
@@ -415,8 +424,6 @@ def jn(cpu, registros, ram):
     return False
 
 
-# jmpr/jzr/jnzr/jcr/jnr son los mismos saltos con modo=2 (por registro)
-# El modo ya viene codificado en la instrucción, así que reusan la misma función
 jmpr = jmp
 jzr  = jz
 jnzr = jnz
@@ -425,95 +432,48 @@ jnr  = jn
 
 
 def call(cpu, registros, ram):
+    """
+    Llamada a subrutina:
+      1. Guarda PC+8 en el stack (8 bytes; SP -= 8)
+      2. Salta al destino
+    CORRECCIÓN: guardaba PC (no PC+8) y usaba ram.write (1 byte).
+    """
     modo, r1, r2, offset, _ = _parse_fmt3(registros)
-    registros.SP -= 1
-    ram.write(registros.SP, registros.PC)
+    ret_addr = registros.PC + 8             # instrucción siguiente al call
+    registros.SP -= 8
+    ram.write_block(registros.SP, _int_to_bin64(ret_addr))
     registros.PC = _jump_target(registros, modo, r1, r2, offset)
     return True
 
 
-def ret(cpu, registros, ram):
-    direccion = ram.read(registros.SP)
-    registros.SP += 1
-    registros.PC = direccion
-    return True
-
-
-def iret(cpu, registros, ram):
-    direccion = ram.read(registros.SP)
-    registros.SP += 1
-    registros.PC = direccion
-    return True
-
-
 # ---------------------------------------------------------------------------
-# Tabla de decodificación del CPU
-#
-# El CPU lee los primeros 4 bits (pre) para saber el formato y cuántos bits
-# tiene el opcode, luego indexa aquí con el opcode dentro del formato.
-#
-# Pre → (opcode_bits, tabla)
+# Tablas de decodificación
 # ---------------------------------------------------------------------------
 
-# F1: pre=0001  opcode 10 bits  → opcodes 0-24
 _F1 = {
-    0:  mov,
-    1:  push,
-    2:  pop,
-    3:  xchg,
-    4:  add,
-    5:  addi,
-    6:  sub,
-    7:  subi,
-    8:  mul,
-    9:  muli,
-    10: div,
-    11: divi,
-    12: inc,
-    13: dec,
-    14: neg,
-    15: and_,
-    16: or_,
-    17: xor,
-    18: not_,
-    19: shl,
-    20: shr,
-    21: rol,
-    22: ror,
-    23: cmp,
-    24: test,
+    0: mov,  1: push,  2: pop,   3: xchg,  4: add,
+    5: addi, 6: sub,   7: subi,  8: mul,   9: muli,
+    10: div, 11: divi, 12: inc,  13: dec,  14: neg,
+    15: and_,16: or_,  17: xor,  18: not_, 19: shl,
+    20: shr, 21: rol,  22: ror,  23: cmp,  24: test,
 }
 
-# F2: pre=0010  opcode 8 bits  → opcodes 0-2
-_F2 = {
-    0: load,
-    1: store,
-    2: lea,
-}
+_F2 = {0: load, 1: store, 2: lea}
 
-# F3: pre=0011  opcode 10 bits  → opcodes 0-10
 _F3 = {
-    0:  jmp,
-    1:  jz,
-    2:  jnz,
-    3:  jc,
-    4:  jn,
-    5:  jmpr,
-    6:  jzr,
-    7:  jnzr,
-    8:  jcr,
-    9:  jnr,
+    0: jmp,  1: jz,   2: jnz,  3: jc,   4: jn,
+    5: jmpr, 6: jzr,  7: jnzr, 8: jcr,  9: jnr,
     10: call,
 }
 
-# F4: pre=0000  opcode 6 bits  → opcodes 0-2
 _F4 = {
     0: nop,
     1: halt,
     2: inti,
+    3: ret,    # ← NUEVO
+    4: iret,   # ← NUEVO
 }
 
-# Mapa principal: pre binario → (opcode_bits, sub-tabla)
 DECODE_TABLE = {
     "0000": (6,  _F4),
     "0001": (10, _F1),
@@ -523,28 +483,11 @@ DECODE_TABLE = {
 
 
 def decode(ir: str):
-    """
-    Recibe el IR completo (64 bits como str) y devuelve la función de ejecución.
-    Lanza KeyError si el pre o el opcode son desconocidos.
-    """
-    pre          = ir[0:4]
+    pre              = ir[0:4]
     opcode_bits, tabla = DECODE_TABLE[pre]
-    opcode       = int(ir[4: 4 + opcode_bits], 2)
+    opcode           = int(ir[4: 4 + opcode_bits], 2)
     return tabla[opcode]
 
 
-# ---------------------------------------------------------------------------
-# Helpers de display (para cpu.py / depuración)
-# ---------------------------------------------------------------------------
-
 def params_format_1(ir: str):
-    """Retorna (pre, opcode, modo, rd, r1, r2, inm) como strings binarios."""
-    return (
-        ir[0:4],    # pre
-        ir[4:14],   # opcode (10 bits)
-        ir[14:20],  # modo   (6 bits)
-        ir[20:24],  # rd     (4 bits)
-        ir[24:28],  # r1     (4 bits)
-        ir[28:32],  # r2     (4 bits)
-        ir[32:64],  # inm    (32 bits)
-    )
+    return (ir[0:4], ir[4:14], ir[14:20], ir[20:24], ir[24:28], ir[28:32], ir[32:64])

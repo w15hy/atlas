@@ -3,7 +3,7 @@ REG_BITS = 64
 ADDR_BITS = 32
 NUM_REGS = 16
 
-SP_INIT = (1 << ADDR_BITS) - 1
+SP_INIT = 5000   # Pila comienza al final de la zona de datos (RAM=6048 bytes)
 REG_MASK = (1 << REG_BITS) - 1
 ADDR_MASK = (1 << ADDR_BITS) - 1
 

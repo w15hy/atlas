@@ -1,5 +1,19 @@
+"""
+assembly.py — Ensamblador de dos pasadas para la máquina sy_00
+==============================================================
+Novedad v2:
+  • Directiva  #include <archivo>  (preprocesador)
+  • Instrucción  ret  (F4 opcode 3)
+  • Instrucción  iret (F4 opcode 4)
+"""
+
 import re
 import sys
+import os
+
+# ---------------------------------------------------------------------------
+# Tabla de instrucciones
+# ---------------------------------------------------------------------------
 
 instr_dict = {
     # ===== FORMATO 1  pre=0001  opcode=10 bits =====
@@ -10,7 +24,8 @@ instr_dict = {
     "add":  {"opcode": 4,  "formato": 1},
     "addi": {"opcode": 5,  "formato": 1},
     "sub":  {"opcode": 6,  "formato": 1},
-    "subi": {"opcode": 7,  "formato": 1},
+    "subi": {"opcode": 7
+             ,  "formato": 1},
     "mul":  {"opcode": 8,  "formato": 1},
     "muli": {"opcode": 9,  "formato": 1},
     "div":  {"opcode": 10, "formato": 1},
@@ -51,6 +66,8 @@ instr_dict = {
     "nop":  {"opcode": 0, "formato": 4},
     "halt": {"opcode": 1, "formato": 4},
     "inti": {"opcode": 2, "formato": 4},
+    "ret":  {"opcode": 3, "formato": 4},   # ← NUEVO
+    "iret": {"opcode": 4, "formato": 4},   # ← NUEVO
 }
 
 # pre(4) → opcode_bits
@@ -63,19 +80,75 @@ pre_instr = {
 
 # Modos F1
 MODOS_F1 = {
-    "registro":                               0,
-    "registro - inmediato":                   1,
-    "registro - registro":                    2,
-    "registro - registro - inmediato":        3,
-    "registro - registro - registro":         4,
+    "registro":                                   0,
+    "registro - inmediato":                       1,
+    "registro - registro":                        2,
+    "registro - registro - inmediato":            3,
+    "registro - registro - registro":             4,
     "registro - registro - registro - inmediato": 5,
 }
 
+
 def zfill_bin(num, bits):
-    # Maneja números negativos con complemento a dos truncado al ancho indicado
+    """Convierte entero a binario de ancho fijo; maneja negativos en C2."""
     if num < 0:
         num = num & ((1 << bits) - 1)
     return bin(num)[2:].zfill(bits)[-bits:]
+
+
+# ---------------------------------------------------------------------------
+# PREPROCESADOR — expande directivas  #include <archivo>
+# ---------------------------------------------------------------------------
+
+_INCLUDE_RE = re.compile(r'^\s*#include\s+[<"]([^>"]+)[>"]\s*$')
+
+
+def preprocesar(lineas, base_dir='.', _depth=0):
+    """
+    Expande directivas  #include <ruta>  o  #include "ruta"
+    de forma recursiva hasta una profundidad máxima de 10 niveles.
+
+    Parámetros:
+        lineas   : list[str]  líneas del archivo fuente
+        base_dir : str        directorio desde donde resolver rutas relativas
+        _depth   : int        nivel de recursión actual (uso interno)
+
+    Retorna:
+        list[str]  con todas las líneas ya expandidas
+    """
+    if _depth > 10:
+        raise RecursionError(
+            "Demasiados niveles de #include (¿inclusión circular?)"
+        )
+
+    resultado = []
+    for linea in lineas:
+        m = _INCLUDE_RE.match(linea)
+        if m:
+            ruta = m.group(1)
+            if not os.path.isabs(ruta):
+                ruta = os.path.join(base_dir, ruta)
+
+            raw = m.group(1)
+            candidatos = [ruta, os.path.join(os.getcwd(), raw)]
+            incluido = False
+            for c in candidatos:
+                try:
+                    with open(c, 'r', encoding='utf-8') as f:
+                        incluidas = f.readlines()
+                    abs_c = os.path.abspath(c)
+                    print(f"  [include] {abs_c}  ({len(incluidas)} líneas)")
+                    resultado.extend(preprocesar(incluidas, os.path.dirname(abs_c), _depth + 1))
+                    incluido = True
+                    break
+                except FileNotFoundError:
+                    continue
+            if not incluido:
+                print(f"  error: #include — '{raw}' no encontrado")
+        else:
+            resultado.append(linea)
+
+    return resultado
 
 
 # ---------------------------------------------------------------------------
@@ -84,47 +157,43 @@ def zfill_bin(num, bits):
 
 def primera_pasada(lineas):
     """
-    Recorre las líneas y asigna a cada etiqueta su dirección en bytes.
+    Asigna a cada etiqueta su dirección en bytes.
     Cada instrucción ocupa 8 bytes (64 bits).
-    Retorna un dict { "loop": 8, "fin": 40, ... }
+    Retorna  { "loop": 8, "fin": 40, ... }
     """
     tabla = {}
-    direccion = 0  # en bytes
+    direccion = 0
 
     for linea in lineas:
         linea_limpia = linea.strip()
 
-        # Ignorar comentarios y líneas vacías
         if not linea_limpia or linea_limpia.startswith("#"):
             continue
 
-        # Eliminar comentario inline
         if "#" in linea_limpia:
             linea_limpia = linea_limpia[:linea_limpia.index("#")].strip()
         if not linea_limpia:
             continue
 
-        # Etiqueta sola en su propia línea:  "loop:"
+        # Etiqueta sola:  "loop:"
         if linea_limpia.endswith(":") and " " not in linea_limpia:
             nombre = linea_limpia[:-1]
             if nombre in tabla:
-                print(f"  advertencia: etiqueta '{nombre}' definida más de una vez")
+                print(f"  advertencia: etiqueta '{nombre}' duplicada")
             tabla[nombre] = direccion
             continue
 
-        # Etiqueta + instrucción en la misma línea:  "fin: halt"
+        # Etiqueta + instrucción:  "fin: halt"
         if ":" in linea_limpia:
             partes = linea_limpia.split(":", 1)
             nombre = partes[0].strip()
-            # Solo registrar como etiqueta si el lado izquierdo parece un
-            # identificador (no un número hexadecimal tipo 0x1A:...)
             if re.match(r'^[A-Za-z_]\w*$', nombre):
                 if nombre in tabla:
-                    print(f"  advertencia: etiqueta '{nombre}' definida más de una vez")
+                    print(f"  advertencia: etiqueta '{nombre}' duplicada")
                 tabla[nombre] = direccion
             resto = partes[1].strip()
             if resto and not resto.startswith("#"):
-                direccion += 8   # la instrucción de esa línea cuenta
+                direccion += 8
             continue
 
         # Línea de instrucción normal
@@ -144,12 +213,9 @@ def encode_f1(opcode, keywords):
     """
     pre        = pre_instr[1]["pre"]
     opcode_bin = zfill_bin(opcode, 10)
-    modo       = 0
-    rd = r1 = r2 = 0
-    inm        = 0
-
-    regs    = []
+    modo = rd = r1 = r2 = 0
     inm_val = None
+    regs = []
 
     for kw in keywords:
         kl = kw.lower()
@@ -160,19 +226,14 @@ def encode_f1(opcode, keywords):
 
     n_regs  = len(regs)
     has_inm = inm_val is not None
+    inm     = inm_val if has_inm else 0
 
-    if n_regs == 1 and not has_inm:
-        modo = 0; rd = regs[0]
-    elif n_regs == 1 and has_inm:
-        modo = 1; rd = regs[0]; inm = inm_val
-    elif n_regs == 2 and not has_inm:
-        modo = 2; rd, r1 = regs[0], regs[1]
-    elif n_regs == 2 and has_inm:
-        modo = 3; rd, r1 = regs[0], regs[1]; inm = inm_val
-    elif n_regs == 3 and not has_inm:
-        modo = 4; rd, r1, r2 = regs[0], regs[1], regs[2]
-    elif n_regs == 3 and has_inm:
-        modo = 5; rd, r1, r2 = regs[0], regs[1], regs[2]; inm = inm_val
+    if   n_regs == 1 and not has_inm: modo = 0; rd = regs[0]
+    elif n_regs == 1 and     has_inm: modo = 1; rd = regs[0]
+    elif n_regs == 2 and not has_inm: modo = 2; rd, r1 = regs[0], regs[1]
+    elif n_regs == 2 and     has_inm: modo = 3; rd, r1 = regs[0], regs[1]
+    elif n_regs == 3 and not has_inm: modo = 4; rd, r1, r2 = regs
+    elif n_regs == 3 and     has_inm: modo = 5; rd, r1, r2 = regs
 
     bits = (
         pre
@@ -194,13 +255,11 @@ def encode_f2(opcode, keywords):
     """
     pre        = pre_instr[2]["pre"]
     opcode_bin = zfill_bin(opcode, 8)
-    modo       = 0
-    r1 = base = index = 0
-    scale = 0
-    offset = 0
-
-    regs     = []
+    modo = r1 = base = index = 0
+    scale = offset = 0
+    regs = []
     literals = []
+
     for kw in keywords:
         kl = kw.lower()
         if kl.startswith("r") and kl[1:].isdigit() and int(kl[1:]) <= 15:
@@ -234,17 +293,14 @@ def encode_f3(opcode, keywords, tabla_simbolos=None, dir_actual=0):
     = 64 bits
 
     Resolución de etiquetas:
-      - jmpr/jzr/jnzr/jcr/jnr (opcodes 5-9) → salto relativo  (offset = destino - dir_actual)
-      - resto                                 → salto absoluto  (offset = dir_destino)
+      - jmpr/jzr/jnzr/jcr/jnr (opcodes 5-9) → salto relativo
+      - resto                                 → salto absoluto
     """
     pre        = pre_instr[3]["pre"]
     opcode_bin = zfill_bin(opcode, 10)
-    modo       = 0
-    r1 = r2    = 0
-    offset     = 0
-    flags      = 0
-
-    regs     = []
+    modo = r1 = r2 = 0
+    offset = flags = 0
+    regs = []
     literals = []
 
     for kw in keywords:
@@ -252,25 +308,23 @@ def encode_f3(opcode, keywords, tabla_simbolos=None, dir_actual=0):
         if kl.startswith("r") and kl[1:].isdigit() and int(kl[1:]) <= 15:
             regs.append(int(kl[1:]))
         elif tabla_simbolos and kw in tabla_simbolos:
-            # ── Resolución de etiqueta ──────────────────────────────
             dir_destino = tabla_simbolos[kw]
-            if opcode in range(5, 10):          # saltos relativos
+            if opcode in range(5, 10):      # saltos relativos
                 offset = dir_destino - dir_actual
                 modo   = 2
-            else:                               # saltos absolutos
+            else:                           # saltos absolutos
                 offset = dir_destino
                 modo   = 0
         else:
             try:
                 literals.append(int(kw, 0))
             except ValueError:
-                print(f"  advertencia: símbolo '{kw}' no encontrado en tabla de símbolos")
+                print(f"  advertencia: símbolo '{kw}' no encontrado")
 
     if len(regs) > 0: r1 = regs[0]
     if len(regs) > 1: r2 = regs[1]
     if literals:      offset = literals[0]
 
-    # Si no se resolvió por etiqueta, inferir modo por opcode
     if modo == 0 and opcode in range(5, 10):
         modo = 2
 
@@ -294,8 +348,8 @@ def encode_f4(opcode, keywords):
     """
     pre        = pre_instr[4]["pre"]
     opcode_bin = zfill_bin(opcode, 6)
-    modo       = 0
-    inm32      = 0
+    modo  = 0
+    inm32 = 0
 
     for kw in keywords:
         kl = kw.lower()
@@ -318,7 +372,7 @@ ENCODERS = {1: encode_f1, 2: encode_f2, 3: encode_f3, 4: encode_f4}
 
 
 # ---------------------------------------------------------------------------
-# Utilidad: normalizar una línea (quitar comentario inline y etiqueta)
+# Utilidad: normalizar una línea
 # ---------------------------------------------------------------------------
 
 def limpiar_linea(linea):
@@ -329,7 +383,6 @@ def limpiar_linea(linea):
     s = linea.strip()
     if not s or s.startswith("#"):
         return None
-    # Eliminar comentario inline
     if "#" in s:
         s = s[:s.index("#")].strip()
     if not s:
@@ -337,7 +390,7 @@ def limpiar_linea(linea):
     # Etiqueta sola
     if s.endswith(":") and " " not in s:
         return None
-    # Etiqueta + instrucción → quedarse solo con la instrucción
+    # Etiqueta + instrucción → solo instrucción
     if ":" in s:
         partes = s.split(":", 1)
         if re.match(r'^[A-Za-z_]\w*$', partes[0].strip()):
@@ -351,44 +404,48 @@ def limpiar_linea(linea):
 
 def main():
     if len(sys.argv) < 2:
-        print("Uso: python assembly.py <archivo_asm> [archivo_salida]")
+        print("Uso: python assembly.py <archivo.asm> [salida.bin]")
         print()
-        print("Argumentos:")
-        print("  archivo_asm   : Archivo con instrucciones (una por línea)")
-        print("  archivo_salida: Archivo para guardar bytecode (opcional)")
+        print("Directivas del preprocesador:")
+        print("  #include <stdlib/vecmat.asm>   # incluye biblioteca")
+        print("  #include \"mi_modulo.asm\"")
         print()
-        print("Formato de etiquetas:")
-        print("  loop:          # etiqueta en su propia línea")
-        print("  fin: halt      # etiqueta + instrucción en la misma línea")
+        print("Etiquetas:")
+        print("  loop:          # etiqueta sola")
+        print("  fin: halt      # etiqueta + instrucción")
         print()
         print("Ejemplo:")
-        print("  python assembly.py programa.asm")
         print("  python assembly.py programa.asm programa.bin")
         sys.exit(1)
 
     input_file  = sys.argv[1]
     output_file = sys.argv[2] if len(sys.argv) > 2 else None
+    base_dir    = os.path.dirname(os.path.abspath(input_file))
 
     try:
-        with open(input_file, 'r') as f:
+        with open(input_file, 'r', encoding='utf-8') as f:
             lineas = f.readlines()
     except FileNotFoundError:
         print(f"error: archivo '{input_file}' no encontrado")
         sys.exit(1)
-    except Exception as e:
-        print(f"error al leer '{input_file}': {e}")
-        sys.exit(1)
+
+    # ── PREPROCESADOR (#include) ────────────────────────────────────────────
+    print(f"\n[1/3] Preprocesando '{input_file}'...")
+    lineas = preprocesar(lineas, base_dir=base_dir)
+    print(f"  → {len(lineas)} líneas tras expandir includes")
 
     # ── PASADA 1: tabla de símbolos ─────────────────────────────────────────
+    print("\n[2/3] Pasada 1 — tabla de símbolos:")
     tabla_simbolos = primera_pasada(lineas)
 
     if tabla_simbolos:
-        print("Tabla de símbolos:")
         for nombre, dir_ in tabla_simbolos.items():
-            print(f"  {nombre:20} → 0x{dir_:04X}  ({dir_} bytes)")
-        print()
+            print(f"  {nombre:25} → 0x{dir_:04X}  ({dir_} bytes)")
+    else:
+        print("  (sin etiquetas)")
 
     # ── PASADA 2: ensamblado ────────────────────────────────────────────────
+    print("\n[3/3] Pasada 2 — ensamblado:")
     resultados = []
     direccion  = 0
 
@@ -402,7 +459,7 @@ def main():
         keywords = [p for p in partes[1:] if p]
 
         if instr not in instr_dict:
-            print(f"[Línea {num_linea}] error: instrucción desconocida '{instr}'")
+            print(f"  [L{num_linea}] error: instrucción desconocida '{instr}'")
             continue
 
         info    = instr_dict[instr]
@@ -417,10 +474,10 @@ def main():
             else:
                 bits = ENCODERS[formato](opcode, keywords)
         except Exception as e:
-            print(f"[Línea {num_linea}] error al codificar '{instr_str}': {e}")
+            print(f"  [L{num_linea}] error al codificar '{instr_str}': {e}")
             continue
 
-        resultado = f"0x{direccion:04X}  {instr:6}  {bits}"
+        resultado = f"  0x{direccion:04X}  {instr:6}  {bits}"
         resultados.append((direccion, bits, resultado))
         print(resultado)
         direccion += 8
@@ -432,7 +489,9 @@ def main():
                 for _, bits, _ in resultados:
                     for i in range(0, len(bits), 8):
                         f.write(bits[i:i+8] + '\n')
-            print(f"\n✓ Bytecode guardado en '{output_file}'")
+            print(f"\n✓ Bytecode guardado en '{output_file}' "
+                  f"({len(resultados)} instrucciones, "
+                  f"{len(resultados)*8} bytes)")
         except Exception as e:
             print(f"\nerror al escribir '{output_file}': {e}")
             sys.exit(1)
