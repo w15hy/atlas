@@ -1,3 +1,7 @@
+# Generated binaries and linker maps
+*.bin
+*.map.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

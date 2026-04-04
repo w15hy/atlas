@@ -42,10 +42,10 @@ def main():
     ram = RAM(6048)
     cpu = CPU(ram)
 
-    instrucciones = load_instructions("data/brun.bin")
+    instrucciones = load_instructions("data/PRUEBITA.bin")
 
     print(
-        f"\n[+] {len(instrucciones)} bytes cargados desde test_vectores.bin: {instrucciones}"
+        f"\n[+] {len(instrucciones)} bytes cargados desde PRUEBITA.bin: {instrucciones}"
     )
 
     print("[+] Cargando instrucciones en RAM desde dirección 0x0000...")
@@ -61,7 +61,6 @@ def main():
     if modo == "1":
         # Modo 1: Ejecución completa
         cpu.run_all()
-        ram.display(1290, 1620)
     elif modo == "2":
         # Modo 2: Paso a paso manual
         cpu.run_step_manual()
