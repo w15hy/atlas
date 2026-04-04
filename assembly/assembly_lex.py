@@ -27,6 +27,8 @@ import re
 import sys
 import struct
 
+import ply.lex as lex
+
 INSTR_DICT = {
     # FORMATO 1  pre=0001  opcode=10 bits
     "mov":  {"opcode": 0,  "formato": 1},
