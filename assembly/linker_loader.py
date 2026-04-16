@@ -41,6 +41,7 @@ from assembly_lex import (
     INSTR_DICT, PRE_INSTR, MNEMONICS, ENCODERS,
     preprocesar, tokenizar_linea, zfill_bin,
     encode_f1, encode_f2, encode_f3, encode_f4, encode_f5,
+    extraer_org,
 )
 
 
@@ -189,6 +190,7 @@ class ObjectModule:
         self.symbols     = {}     # {name: {address, binding}}
         self.relocations = []     # [{offset, symbol, rel_type, instr_index, formato}]
         self.size        = 0      # total bytes
+        self.org_base    = 0      # dirección .org del módulo
 
     def to_dict(self):
         return {
@@ -386,7 +388,12 @@ def ensamblar_modulo(filepath):
     lineas = preprocesar(lineas_raw, base_dir=base_dir)
     print(f"  -> {len(lineas)} líneas tras preprocesar")
 
-    # 2. Extraer .global / .extern
+    # 2. Extraer .org
+    org_base, lineas = extraer_org(lineas)
+    if org_base:
+        print(f"  -> .org detectado: dirección base = {org_base} (0x{org_base:04X})")
+
+    # 3. Extraer .global / .extern
     globals_set, externs_set, lineas_clean = _extraer_directivas(lineas)
     if globals_set:
         print(f"  -> Símbolos exportados (.global): {globals_set}")
@@ -409,6 +416,7 @@ def ensamblar_modulo(filepath):
     obj          = ObjectModule(os.path.basename(filepath))
     obj.code     = code
     obj.size     = len(code) * INSTR_SIZE
+    obj.org_base = org_base
 
     for nombre, dir_ in tabla_local.items():
         binding = SYM_GLOBAL if nombre in globals_set else SYM_LOCAL
@@ -426,7 +434,7 @@ def ensamblar_modulo(filepath):
 # FASE 2 — ENLAZADOR: combinar módulos, resolver símbolos, reubicar
 # =============================================================================
 
-def enlazar(modulos):
+def enlazar(modulos, text_base=None):
     """
     Enlaza una lista de ObjectModule en un único binario.
 
@@ -446,7 +454,7 @@ def enlazar(modulos):
     print(f"{'='*60}")
 
     # ── Paso 1: Layout — asignar dirección base a cada módulo ─────────────
-    base_addr = TEXT_BASE
+    base_addr = text_base if text_base is not None else TEXT_BASE
     layout    = []   # [(módulo, base_addr)]
 
     for mod in modulos:
@@ -622,14 +630,17 @@ def _parchear_instruccion(bits, formato, valor):
 # FASE 3 — CARGADOR: generar binario de salida
 # =============================================================================
 
-def generar_binario(code_final, output_path):
+def generar_binario(code_final, output_path, base_addr=0):
     """
     Escribe el binario final en formato compatible con main.py:
     un byte (8 bits) por línea, texto plano.
+    Si base_addr > 0, incluye encabezado @<dirección>.
 
     Cada instrucción de 64 bits se divide en 8 bytes.
     """
     with open(output_path, 'w') as f:
+        if base_addr > 0:
+            f.write(f'@{base_addr}\n')
         for i, bits in enumerate(code_final):
             assert len(bits) == 64, f"Instrucción {i} tiene {len(bits)} bits, esperados 64"
             for byte_idx in range(0, 64, 8):
@@ -733,6 +744,7 @@ def main():
         print()
         print("Opciones:")
         print("  -o <archivo>    Archivo binario de salida")
+        print("  --base <addr>   Dirección base de carga (decimal, default 0)")
         print("  --lexico        Muestra tokens reconocidos (modo demo)")
         print("  --mapa          Genera archivo .map.json con info de enlace")
         print()
@@ -755,12 +767,16 @@ def main():
     output_file = None
     modo_lexico = False
     modo_mapa   = False
+    base_carga  = None
 
     i = 1
     while i < len(sys.argv):
         arg = sys.argv[i]
         if arg == '-o' and i + 1 < len(sys.argv):
             output_file = sys.argv[i + 1]
+            i += 2
+        elif arg == '--base' and i + 1 < len(sys.argv):
+            base_carga = int(sys.argv[i + 1])
             i += 2
         elif arg == '--lexico':
             modo_lexico = True
@@ -800,16 +816,22 @@ def main():
         for nombre in modulos[0].symbols:
             if modulos[0].symbols[nombre]["binding"] == SYM_LOCAL:
                 modulos[0].symbols[nombre]["binding"] = SYM_GLOBAL
-
+    # ── Determinar dirección base: --base > .org > 0 ──────────────────────
+    if base_carga is None:
+        # Usar .org del primer módulo si existe
+        org_bases = [m.org_base for m in modulos if m.org_base > 0]
+        if org_bases:
+            base_carga = org_bases[0]
     # ── Enlazar ───────────────────────────────────────────────────────────────
-    code_final, mapa = enlazar(modulos)
+    code_final, mapa = enlazar(modulos, text_base=base_carga)
     if code_final is None:
         print("\n  ABORTANDO: errores de enlace")
         sys.exit(1)
 
     # ── Generar binario ───────────────────────────────────────────────────────
+    link_base = base_carga if base_carga is not None else TEXT_BASE
     if output_file:
-        generar_binario(code_final, output_file)
+        generar_binario(code_final, output_file, base_addr=link_base)
     else:
         # Sin archivo de salida: imprimir al stdout
         print("\n  Binario resultante (instrucciones):")

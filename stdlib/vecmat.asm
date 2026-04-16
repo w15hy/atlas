@@ -250,6 +250,107 @@ _MF_LOOP:
     jnz   _MF_LOOP
     ret
 
+# ------------------------------------------------------------
+# MAT_MUL — Multiplicación de matrices  C = A × B
+# Entrada : R0 = base_A, R1 = base_B, R2 = base_C
+#           A(rows_A × cols_A)  B(rows_B × cols_B)
+#           cols_A debe ser == rows_B
+#           C debe tener espacio para rows_A × cols_B + 2
+# Salida  : C escrita con cabecera (rows_A, cols_B) y datos
+# Clobbers: R0-R7 (guarda y restaura R8-R15 via stack)
+#
+# Registros internos:
+#   R8  = base_A     R9  = base_B     R10 = base_C
+#   R11 = rows_A     R12 = cols_A     R13 = cols_B
+#   R0  = i          R1  = j          R2  = k
+#   R3  = acumulador R4,R5,R6,R7 = scratch
+# ------------------------------------------------------------
+MAT_MUL:
+    push  R8
+    push  R9
+    push  R10
+    push  R11
+    push  R12
+    push  R13
+
+    # Guardar bases
+    mov   R8, R0                # R8  = base_A
+    mov   R9, R1                # R9  = base_B
+    mov   R10, R2               # R10 = base_C
+
+    # Leer dimensiones
+    load  R11, R8, 0, 0         # R11 = rows_A
+    load  R12, R8, 0, 1         # R12 = cols_A
+    load  R13, R9, 0, 1         # R13 = cols_B
+
+    # Escribir cabecera de C
+    store R11, R10, 0, 0        # C.rows = rows_A
+    store R13, R10, 0, 1        # C.cols = cols_B
+
+    # Triple bucle: i=0..rows_A-1, j=0..cols_B-1, k=0..cols_A-1
+    mov   R0, 0                 # i = 0
+_MM_I:
+    cmp   R0, R11
+    jge   _MM_DONE
+
+    mov   R1, 0                 # j = 0
+_MM_J:
+    cmp   R1, R13
+    jge   _MM_NEXT_I
+
+    mov   R3, 0                 # acum = 0
+    mov   R2, 0                 # k = 0
+_MM_K:
+    cmp   R2, R12
+    jge   _MM_STORE
+
+    # R4 = addr_A = base_A + 2 + i*cols_A + k
+    mov   R4, R0
+    mul   R4, R12               # i * cols_A
+    add   R4, R2                # + k
+    addi  R4, 2                 # + 2 (cabecera)
+    lea   R5, R8, R4, 1, 0     # R5 = base_A + offset
+    load  R6, R5, 0, 0         # R6 = A[i][k]
+
+    # R4 = addr_B = base_B + 2 + k*cols_B + j
+    mov   R4, R2
+    mul   R4, R13               # k * cols_B
+    add   R4, R1                # + j
+    addi  R4, 2                 # + 2 (cabecera)
+    lea   R5, R9, R4, 1, 0     # R5 = base_B + offset
+    load  R7, R5, 0, 0         # R7 = B[k][j]
+
+    mul   R6, R7               # A[i][k] * B[k][j]
+    add   R3, R6               # acum += producto
+
+    inc   R2
+    jmp   _MM_K
+
+_MM_STORE:
+    # addr_C = base_C + 2 + i*cols_B + j
+    mov   R4, R0
+    mul   R4, R13               # i * cols_B
+    add   R4, R1                # + j
+    addi  R4, 2                 # + 2 (cabecera)
+    lea   R5, R10, R4, 1, 0    # R5 = base_C + offset
+    store R3, R5, 0, 0         # C[i][j] = acum
+
+    inc   R1
+    jmp   _MM_J
+
+_MM_NEXT_I:
+    inc   R0
+    jmp   _MM_I
+
+_MM_DONE:
+    pop   R13
+    pop   R12
+    pop   R11
+    pop   R10
+    pop   R9
+    pop   R8
+    ret
+
 # ============================================================
 # fin de stdlib/vecmat.asm
 # ============================================================

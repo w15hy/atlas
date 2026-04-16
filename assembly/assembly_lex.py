@@ -58,10 +58,13 @@ INSTR_DICT = {
     "test": {"opcode": 24, "formato": 1},
     "mod":  {"opcode": 25, "formato": 1},
     "modi": {"opcode": 26, "formato": 1},
+    "out":  {"opcode": 27, "formato": 1},
     # FORMATO 2  pre=0010  opcode=8 bits
     "load":  {"opcode": 0, "formato": 2},
     "store": {"opcode": 1, "formato": 2},
     "lea":   {"opcode": 2, "formato": 2},
+    "loadw":  {"opcode": 3, "formato": 2},
+    "storew": {"opcode": 4, "formato": 2},
     # FORMATO 3  pre=0011  opcode=10 bits
     "jmp":  {"opcode": 0,  "formato": 3},
     "jz":   {"opcode": 1,  "formato": 3},
@@ -341,6 +344,7 @@ def encode_f1(opcode, keywords):
 def encode_f2(opcode, keywords):
     """
     Layout: [ pre(4) ][ opcode(8) ][ modo(6) ][ r1(4) ][ base(4) ][ index(4) ][ scale(2) ][ offset(32) ]
+    Modos:  0=completo (base+index*scale+offset)  1=absoluto (offset)  2=base+offset
     """
     pre        = PRE_INSTR[2]["pre"]
     opcode_bin = zfill_bin(opcode, 8)
@@ -359,11 +363,29 @@ def encode_f2(opcode, keywords):
             except (ValueError, TypeError):
                 pass
 
-    if len(regs) > 0: r1    = regs[0]
-    if len(regs) > 1: base  = regs[1]
-    if len(regs) > 2: index = regs[2]
-    if len(literals) > 0: scale  = literals[0]
-    if len(literals) > 1: offset = literals[1]
+    n_regs = len(regs)
+    if n_regs > 0: r1    = regs[0]
+    if n_regs > 1: base  = regs[1]
+    if n_regs > 2: index = regs[2]
+
+    # Asignar literales según modo de direccionamiento
+    if n_regs <= 1:
+        modo = 1                          # absoluto: addr = offset
+        if literals:
+            offset = literals[0]
+    elif n_regs == 2:
+        if len(literals) >= 2:
+            modo   = 0                    # completo
+            scale  = literals[0]
+            offset = literals[1]
+        else:
+            modo = 2                      # base + offset
+            if literals:
+                offset = literals[0]
+    else:                                 # 3+ registros
+        modo = 0                          # completo
+        if len(literals) > 0: scale  = literals[0]
+        if len(literals) > 1: offset = literals[1]
 
     bits = (pre + opcode_bin
             + zfill_bin(modo, 6)   + zfill_bin(r1, 4)
@@ -497,17 +519,37 @@ ENCODERS = {1: encode_f1, 2: encode_f2, 3: encode_f3, 4: encode_f4, 5: encode_f5
 
 
 # =============================================================================
+# EXTRACCIÓN DE .org — dirección base de carga
+# =============================================================================
+
+_ORG_RE = re.compile(r'^\s*\.org\s+(\d+)\s*(?:#.*)?$', re.IGNORECASE)
+
+
+def extraer_org(lineas):
+    """Extrae la directiva .org <dirección> y devuelve (base, lineas_limpias)."""
+    base  = 0
+    clean = []
+    for linea in lineas:
+        m = _ORG_RE.match(linea.strip())
+        if m:
+            base = int(m.group(1))
+        else:
+            clean.append(linea)
+    return base, clean
+
+
+# =============================================================================
 # PASADA 1 — construir tabla de símbolos usando el lexer PLY
 # =============================================================================
 
-def primera_pasada(lineas):
+def primera_pasada(lineas, base=0):
     """
     Recorre las líneas usando el lexer léxico para identificar
     ETIQUETA_DEF e INSTRUCCION, y asigna la dirección de cada etiqueta.
     Cada instrucción ocupa 8 bytes (64 bits).
     """
     tabla     = {}
-    direccion = 0
+    direccion = base
 
     for linea in lineas:
         linea_str = linea.strip()
@@ -537,7 +579,7 @@ def primera_pasada(lineas):
 # PASADA 2 — ensamblado usando el lexer PLY
 # =============================================================================
 
-def segunda_pasada(lineas, tabla_simbolos):
+def segunda_pasada(lineas, tabla_simbolos, base=0):
     """
     Por cada línea:
       1. Tokeniza con PLY/lex
@@ -545,7 +587,7 @@ def segunda_pasada(lineas, tabla_simbolos):
       3. Codifica en 64 bits según el formato correspondiente
     """
     resultados = []
-    direccion  = 0
+    direccion  = base
 
     for num_linea, linea in enumerate(lineas, 1):
         toks = tokenizar_linea(linea)
@@ -666,6 +708,11 @@ def main():
     lineas = preprocesar(lineas, base_dir=base_dir)
     print(f"  → {len(lineas)} líneas tras expandir directivas")
 
+    # ── Extraer .org ───────────────────────────────────────────────────────────
+    org_base, lineas = extraer_org(lineas)
+    if org_base:
+        print(f"  → .org detectado: dirección base = {org_base} (0x{org_base:04X})")
+
     # ── DEMO LÉXICO (opcional) ─────────────────────────────────────────────────
     if modo_lexico:
         demo_lexico(lineas)
@@ -673,7 +720,7 @@ def main():
 
     # ── PASADA 1: tabla de símbolos ────────────────────────────────────────────
     print("\n[2/3] Pasada 1 — tabla de símbolos (análisis léxico PLY):")
-    tabla_simbolos = primera_pasada(lineas)
+    tabla_simbolos = primera_pasada(lineas, base=org_base)
 
     if tabla_simbolos:
         for nombre, dir_ in tabla_simbolos.items():
@@ -683,12 +730,14 @@ def main():
 
     # ── PASADA 2: ensamblado ───────────────────────────────────────────────────
     print("\n[3/3] Pasada 2 — ensamblado:")
-    resultados = segunda_pasada(lineas, tabla_simbolos)
+    resultados = segunda_pasada(lineas, tabla_simbolos, base=org_base)
 
     # ── Guardar en archivo ─────────────────────────────────────────────────────
     if output_file:
         try:
             with open(output_file, 'w') as f:
+                if org_base:
+                    f.write(f'@{org_base}\n')
                 for _, bits, _ in resultados:
                     for i in range(0, len(bits), 8):
                         f.write(bits[i:i+8] + '\n')

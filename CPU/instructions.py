@@ -581,37 +581,73 @@ def test(cpu, registros, ram):
     return False
 
 
+def out_(cpu, registros, ram):
+    """out rd — muestra el valor del registro rd por el dispositivo de salida."""
+    _, rd, _, _, _ = _parse_fmt1(registros)
+    val = registros.get_reg(rd)
+    print(f"[OUT] R{rd} = {val}")
+    return False
+
+
 # ---------------------------------------------------------------------------
 # F2 — Memoria
 # ---------------------------------------------------------------------------
 
+def _f2_addr(registros, modo, base, index, scale, offset):
+    """Calcula dirección efectiva según el modo de direccionamiento F2.
+    modo=0: completo   addr = R[base] + R[index]*scale + offset
+    modo=1: absoluto   addr = offset
+    modo=2: base+off   addr = R[base] + offset
+    """
+    if modo == 1:
+        return offset
+    elif modo == 2:
+        return registros.get_reg(base) + offset
+    else:
+        return registros.get_reg(base) + registros.get_reg(index) * scale + offset
+
+
 def load(cpu, registros, ram):
     """Carga 1 byte de la RAM al registro (bits[7:0])."""
-    _, r1, base, index, scale, offset = _parse_fmt2(registros)
-    addr     = registros.get_reg(base) + registros.get_reg(index) * scale + offset
+    modo, r1, base, index, scale, offset = _parse_fmt2(registros)
+    addr     = _f2_addr(registros, modo, base, index, scale, offset)
     byte_str = ram.read(addr)           # string '01001010'
     registros.set_reg(r1, int(byte_str, 2))
     return False
 
 
 def store(cpu, registros, ram):
-    """
-    Almacena 1 byte del registro en la RAM.
-    CORRECCIÓN: el original pasaba un int a ram.write(), que requiere
-    string binario de exactamente 8 bits.
-    """
-    _, r1, base, index, scale, offset = _parse_fmt2(registros)
-    addr = registros.get_reg(base) + registros.get_reg(index) * scale + offset
+    """Almacena 1 byte del registro en la RAM."""
+    modo, r1, base, index, scale, offset = _parse_fmt2(registros)
+    addr = _f2_addr(registros, modo, base, index, scale, offset)
     val  = registros.get_reg(r1) & 0xFF        # tomar solo los 8 bits bajos
     ram.write(addr, format(val, '08b'))         # '01001010'
     return False
 
 
 def lea(cpu, registros, ram):
-    """Load Effective Address: r1 = base + index*scale + offset."""
-    _, r1, base, index, scale, offset = _parse_fmt2(registros)
-    addr = registros.get_reg(base) + registros.get_reg(index) * scale + offset
+    """Load Effective Address: r1 = dirección efectiva calculada."""
+    modo, r1, base, index, scale, offset = _parse_fmt2(registros)
+    addr = _f2_addr(registros, modo, base, index, scale, offset)
     registros.set_reg(r1, addr)
+    return False
+
+
+def loadw(cpu, registros, ram):
+    """Carga 8 bytes (64 bits / 1 palabra) de la RAM al registro."""
+    modo, r1, base, index, scale, offset = _parse_fmt2(registros)
+    addr = _f2_addr(registros, modo, base, index, scale, offset)
+    data = ram.read_block(addr, 8)
+    registros.set_reg(r1, int(data, 2))
+    return False
+
+
+def storew(cpu, registros, ram):
+    """Almacena 8 bytes (64 bits / 1 palabra) del registro en la RAM."""
+    modo, r1, base, index, scale, offset = _parse_fmt2(registros)
+    addr = _f2_addr(registros, modo, base, index, scale, offset)
+    val = registros.get_reg(r1)
+    ram.write_block(addr, format(val & 0xFFFFFFFFFFFFFFFF, '064b'))
     return False
 
 
@@ -712,10 +748,10 @@ _F1 = {
     10: div, 11: divi, 12: inc,  13: dec,  14: neg,
     15: and_,16: or_,  17: xor,  18: not_, 19: shl,
     20: shr, 21: rol,  22: ror,  23: cmp,  24: test,
-    25: mod, 26: modi,
+    25: mod, 26: modi, 27: out_,
 }
 
-_F2 = {0: load, 1: store, 2: lea}
+_F2 = {0: load, 1: store, 2: lea, 3: loadw, 4: storew}
 
 _F3 = {
     0: jmp,  1: jz,   2: jnz,  3: jc,   4: jn,
