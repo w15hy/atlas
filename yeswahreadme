@@ -1,0 +1,18 @@
+feat: MAT_MUL en vecmat, programa D integral, inspector de memoria y fix .org en linker
+
+Agregar función MAT_MUL a stdlib/vecmat.asm (triple loop, 1 byte por elemento, push/pop R8-R13)
+Reescribir data/matmul.asm para usar #include <stdlib/vecmat.asm> en vez de matmul_lib
+Reescribir data/matmul_pp.asm con #define + #include <stdlib/vecmat.asm>
+Crear data/programa_d.asm: demostración integral con las 3 bibliotecas
+GCD(252,105)=21 via gcd_lib.asm (storew 64-bit)
+3^5=243 via power_lib.asm (storew 64-bit)
+Matmul 3×2 × 2×4 via vecmat.asm (store 8-bit)
+Salida: 21, 243, 11, 14, 17, 20, 23, 30, 37, 44, 35, 46, 57, 68
+Agregar inspector de memoria interactivo en main.py
+Prompt mem> tras ejecución, soporta hex/dec/bin, +N para multi-byte
+Corregir manejo de .org en linker_loader.py
+Importar extraer_org desde assembly_lex
+Llamar extraer_org en ensamblar_modulo y guardar org_base en ObjectModule
+Usar .org como base de carga cuando no se pasa --base
+
+Todos los programas verificados: matmul, matmul_pp, programa_d, euclides_pp, fast_power_pp

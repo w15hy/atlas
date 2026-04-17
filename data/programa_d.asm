@@ -4,7 +4,7 @@
 # Usa las 3 bibliotecas existentes mediante #include:
 #   - stdlib/gcd_lib.asm      (GCD por restas sucesivas)
 #   - stdlib/power_lib.asm    (Exponenciación rápida)
-#   - stdlib/vecmat.asm       (Vectores + Matrices, con MAT_MUL)
+#   - stdlib/vecmat.asm       (Vectores + Matrices con MAT_MUL)
 #
 # Cálculos:
 #   1) GCD(252, 105) = 21                       → resultado en [500]

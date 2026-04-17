@@ -1,6 +1,6 @@
 # ============================================================
 # vecmat.asm  —  Biblioteca estándar: Vectores y Matrices
-# Máquina Von Neumann sy_00
+# Máquina ATLAS. 
 # ============================================================
 #
 # CÓMO INCLUIR:
@@ -16,6 +16,8 @@
 #   Scratch      : R4, R5, R6, R7  (pueden ser modificados)
 #   Llamada      : call NOMBRE_FUNCION   →   ret  (dentro)
 #
+#
+# NOTA IMPORTANTE: ESTA LIBRERIA TRABAJA CON 1 BYTE POR DATO. 
 # ============================================================
 # LAYOUT EN MEMORIA — VECTOR
 #   mem[base + 0]         = N  (longitud)
