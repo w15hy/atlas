@@ -1,26 +1,26 @@
 import time
 
 from CPU.buses import BusInterface
-from CPU.instructions import decode, params_format_1
+from CPU.instructions import decode
 from CPU.ram import RAM
 from CPU.registers import Registers
 
 # pre(4 bits) → cuántos bits tiene el opcode
 _PRE_OPCODE_BITS = {
-    "0000": 6,   # F4 control
+    "0000": 6,  # F4 control
     "0001": 10,  # F1 reg/inm
-    "0010": 8,   # F2 memoria
+    "0010": 8,  # F2 memoria
     "0011": 10,  # F3 saltos
 }
 
 
 class CPU:
     def __init__(self, ram, interrupt_table=None):
-        self.ram             = ram
-        self.reg             = Registers()
-        self.buses           = BusInterface()  # ← BUSES EXPLÍCITOS
-        self.running         = True
-        self.step_count      = 0
+        self.ram = ram
+        self.reg = Registers()
+        self.buses = BusInterface()  # ← BUSES EXPLÍCITOS
+        self.running = True
+        self.step_count = 0
         self.interrupt_table = interrupt_table or {}
 
     # ------------------------------------------------------------------
@@ -122,13 +122,14 @@ class CPU:
     def _instr_name(self):
         """Nombre legible de la instrucción en IR."""
         from CPU.instructions import DECODE_TABLE
-        ir  = self.reg.IR
+
+        ir = self.reg.IR
         pre = ir[0:4]
         if pre not in DECODE_TABLE:
             return f"UNKNOWN(pre={pre})"
         opcode_bits, tabla = DECODE_TABLE[pre]
-        opcode = int(ir[4: 4 + opcode_bits], 2)
-        func   = tabla.get(opcode)
+        opcode = int(ir[4 : 4 + opcode_bits], 2)
+        func = tabla.get(opcode)
         return func.__name__.upper() if func else f"UNKNOWN(op={opcode})"
 
     def display_state(self):
@@ -156,7 +157,7 @@ class CPU:
         print(f"    PC = 0x{self.reg.PC:08X}  ({self.reg.PC})")
         print(f"    SP = 0x{self.reg.SP:08X}  ({self.reg.SP})")
 
-        flags     = self.reg.get_flags()
+        flags = self.reg.get_flags()
         flags_str = " | ".join(f"{k}={'1' if v else '0'}" for k, v in flags.items())
         print(f"\n  FLAGS: {flags_str}")
 

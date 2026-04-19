@@ -1,6 +1,7 @@
+import sys
+
 from CPU.cpu import CPU
 from CPU.ram import RAM
-import sys
 
 
 def load_instructions(filepath: str):
@@ -45,16 +46,14 @@ def show_menu():
 
 def main():
 
-    filepath = sys.argv[1] if len(sys.argv) > 1 else "data/PRUEBITA.bin"
+    filepath = sys.argv[1] if len(sys.argv) > 1 else "data/brun.bin"
 
     ram = RAM(65536)
     cpu = CPU(ram)
 
     instrucciones, base_addr = load_instructions(filepath)
 
-    print(
-        f"\n[+] {len(instrucciones)} bytes cargados desde {filepath}"
-    )
+    print(f"\n[+] {len(instrucciones)} bytes cargados desde {filepath}")
     if base_addr:
         print(f"[+] Dirección base de carga: {base_addr} (0x{base_addr:04X})")
 
@@ -112,14 +111,14 @@ def main():
             entrada = input("  mem> ").strip()
         except (EOFError, KeyboardInterrupt):
             break
-        if not entrada or entrada.lower() == 'q':
+        if not entrada or entrada.lower() == "q":
             break
 
         try:
             # Parsear dirección y cantidad opcional
             n_bytes = 1
-            if '+' in entrada:
-                parts = entrada.split('+', 1)
+            if "+" in entrada:
+                parts = entrada.split("+", 1)
                 addr = int(parts[0].strip(), 0)
                 n_bytes = int(parts[1].strip(), 0)
             else:
@@ -136,28 +135,31 @@ def main():
 
             if n_bytes == 1:
                 byte_str = ram.read(addr)
-                print(f"  [{addr} / 0x{addr:04X}]  bin={byte_str}  "
-                      f"dec={int(byte_str, 2)}  hex=0x{int(byte_str, 2):02X}")
+                print(
+                    f"  [{addr} / 0x{addr:04X}]  bin={byte_str}  "
+                    f"dec={int(byte_str, 2)}  hex=0x{int(byte_str, 2):02X}"
+                )
             else:
-                print(f"  [{addr} / 0x{addr:04X}] .. "
-                      f"[{addr + n_bytes - 1} / 0x{addr + n_bytes - 1:04X}]  "
-                      f"({n_bytes} bytes)")
+                print(
+                    f"  [{addr} / 0x{addr:04X}] .. "
+                    f"[{addr + n_bytes - 1} / 0x{addr + n_bytes - 1:04X}]  "
+                    f"({n_bytes} bytes)"
+                )
                 # Mostrar fila por fila de 8 bytes
                 for off in range(0, n_bytes, 8):
                     chunk = min(8, n_bytes - off)
-                    bytes_str = " ".join(
-                        ram.read(addr + off + b) for b in range(chunk)
-                    )
+                    bytes_str = " ".join(ram.read(addr + off + b) for b in range(chunk))
                     dec_vals = " ".join(
-                        f"{int(ram.read(addr + off + b), 2):3d}"
-                        for b in range(chunk)
+                        f"{int(ram.read(addr + off + b), 2):3d}" for b in range(chunk)
                     )
                     print(f"    0x{addr + off:04X} | {bytes_str}")
                     print(f"           dec: {dec_vals}")
                 # Si cabe en 64 bits, mostrar valor entero
                 if n_bytes <= 8:
-                    print(f"    -> valor entero ({n_bytes * 8} bits): "
-                          f"{valor_int}  (0x{valor_int:X})")
+                    print(
+                        f"    -> valor entero ({n_bytes * 8} bits): "
+                        f"{valor_int}  (0x{valor_int:X})"
+                    )
 
         except Exception as e:
             print(f"  [!] Error: {e}")
