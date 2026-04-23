@@ -17,7 +17,7 @@ def main_page(page: ft.Page):
     c2 = ft.Container(
         content=ft.Text("C2 (1/4)"),
         bgcolor="green",
-        expand=1,  # 👈 1 parte
+        expand=1,
         width=float("inf"),
     )
 
