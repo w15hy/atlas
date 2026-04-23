@@ -49,6 +49,12 @@ def t_newline(t):
 t_ignore = " \t"
 
 
+# Define a rule to ignore comments
+def t_COMMENT(t):
+    r"\#.*"
+    pass
+
+
 # Error handling rule
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])

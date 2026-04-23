@@ -2,38 +2,29 @@ import flet as ft
 
 
 def main_page(page: ft.Page):
-    page.title = "Editor + Consola"
-    page.window_width = 1000
-    page.window_height = 700
+
+    page.title = "ATLAS"
     page.padding = 0
     page.spacing = 0
 
-    editor = ft.TextField(
-        multiline=True,
-        expand=True,
-        min_lines=20,
-        border=ft.InputBorder.NONE,
-        hint_text="Escribe código aquí...",
-        text_size=16,
+    c1 = ft.Container(
+        content=ft.Text("C1 (3/4)"),
+        bgcolor="blue",
+        expand=3,
+        width=float("inf"),
     )
 
-    consola = ft.TextField(
-        multiline=True,
-        expand=True,
-        min_lines=8,
-        border=ft.InputBorder.NONE,
-        value=">>> Consola lista...\n",
-        text_style=ft.TextStyle(font_family="monospace"),
+    c2 = ft.Container(
+        content=ft.Text("C2 (1/4)"),
+        bgcolor="green",
+        expand=1,  # 👈 1 parte
+        width=float("inf"),
     )
 
-    layout = ft.Column(
-        expand=True,
-        spacing=0,
-        controls=[
-            ft.Container(content=editor, expand=3, padding=10),
-            ft.Divider(height=1),
-            ft.Container(content=consola, expand=1, padding=10),
-        ],
+    page.add(
+        ft.Column(
+            spacing=0,
+            controls=[c1, c2],
+            expand=True,
+        )
     )
-
-    page.add(layout)
