@@ -1,0 +1,12 @@
+[project]
+name = "ATLAS"
+version = "0.1.0"
+description = "Emulador, preprocesador, compilador, ensamblador, enlazador para la computadora ATLAS."
+dependencies = [
+    "flet",
+    "ply",
+]
+
+[project.scripts]
+run = "main:main"
+lexer = "toolchain.lexer:main"
