@@ -1,0 +1,16 @@
+def euclides(a, b){
+    while a != b{
+        if(a > b){
+            a = a - b
+        } else{
+            b = b - a
+        }
+    }
+    return a
+}
+
+
+x = int(input())
+y = int(input())
+
+print(euclides(x, y))
