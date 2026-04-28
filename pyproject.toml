@@ -9,4 +9,6 @@ dependencies = [
 
 [project.scripts]
 run = "main:main"
-lexer = "toolchain.preprocessor.lexer:main"
+lexer = "toolchain.compiler.lexical_analysis.lexer:main"
+
+

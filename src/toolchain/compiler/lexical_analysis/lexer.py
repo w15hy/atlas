@@ -51,6 +51,8 @@ reserved = {
     "elif": "KW",
     "def": "KW",
     "do": "KW",
+    "struct": "KW",
+    "package": "KW",
 }
 
 delimiters = {
