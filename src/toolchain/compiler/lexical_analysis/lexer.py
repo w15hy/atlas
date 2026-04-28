@@ -55,18 +55,8 @@ reserved = {
     "package": "KW",
 }
 
-delimiters = {
-    "(": "DEL",
-    ")": "DEL",
-    "{": "DEL",
-    "}": "DEL",
-    "[": "DEL",
-    "]": "DEL",
-}
-
 tokens = ["KW", "ID", "NUMBER", "RELOP", "ASSIGN", "TYPE", "DEL"]
-literals = ["+", "-", "*", "/", ","]
-
+literals = ["+", "-", "*", "/", ",", "^"]
 
 @TOKEN(identifier)
 def t_ID(t):
@@ -86,7 +76,7 @@ def t_RELOP(t):
 
 
 def t_DEL(t):
-    r"[\(\)\{\}\[\]]"
+    r"[\(\)\{\}\[\]\;]"
     return t
 
 
@@ -137,3 +127,6 @@ def main():
 
     for err in errors:
         print(err)
+
+if __name__ == "__main__":
+    main()
