@@ -1,6 +1,7 @@
 #define PI 3.1416
 #define NOMBRE "yeswah"
 #define SUMA(a,b) ((a)+(b))
+#define AREA_CIRCULO(radio) (PI * radio^2)
 
 def euclides(a, b){
     while a != b{
@@ -13,12 +14,14 @@ def euclides(a, b){
     return a
 }
 
-def area_circulo(){
+def area_circulo(radio){
     area = PI * radio ^ 2;
     return area;
 }
 
 int suma = SUMA(5,4)
+int circulito = AREA_CIRCULO(10) 
+
 
 string a = NOMBRE
 x = int(input());

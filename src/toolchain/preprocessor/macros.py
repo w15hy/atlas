@@ -3,7 +3,6 @@ import re
 dict_macros = {}
 lines = []
 
-
 def parse_define(line):
     if re.search(r"#define\s+[A-Za-z_]\w*\s*\(", line):
         definir_con_parametros(line)
@@ -90,6 +89,10 @@ def expandir_macro_con_parametros(linea, key, value):
 
     for param, arg in zip(value["params"], args):
         resultado = re.sub(r"\b" + re.escape(param) + r"\b", arg.strip(), resultado)
+
+    for key, value in dict_macros.items():
+        if isinstance(value, str):
+            resultado = re.sub(r"\b" + re.escape(key) + r"\b", value, resultado) 
 
     fin = linea.find(")", inicio) + 1
 
