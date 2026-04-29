@@ -46,7 +46,7 @@ def show_menu():
 
 def main():
 
-    filepath = sys.argv[1] if len(sys.argv) > 1 else "data/brun.bin"
+    filepath = sys.argv[1] if len(sys.argv) > 1 else "data/asm/factorial.bin"
 
     ram = RAM(65536)
     cpu = CPU(ram)
