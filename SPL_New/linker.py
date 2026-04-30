@@ -5,6 +5,7 @@ import sys
 
 BASE_RE = re.compile(r'^\s*#BASE\s+(\d+)\s*$')
 RELOC_RE = re.compile(r'^(\d+)(?:\s+(\d+))(?:\s+(\d+))?$')
+PLACEHOLDER_RE = re.compile(r'\{[^}]+\}')
 
 FIELD_RANGES = {
     1: (32, 64),
@@ -131,25 +132,37 @@ def translate(parsed_program):
     for relocation in parsed_program['relocations']:
         source_index = relocation['source_index']
         target_index = relocation['target_index']
+        instruction_format = relocation['format']
 
         if source_index < 0 or source_index >= len(linked_lines):
             raise ValueError(f'Relocation source out of range: {source_index}')
 
-        if '{dir}' not in linked_lines[source_index]:
-            raise ValueError(
-                f"Relocation source {source_index} does not contain '{{dir}}'"
-            )
-
         absolute_address = parsed_program['base_address'] + target_index
+        replacement = format(absolute_address, '032b')
+        placeholder_match = PLACEHOLDER_RE.search(linked_lines[source_index])
 
-        linked_lines[source_index] = linked_lines[source_index].replace(
-            '{dir}',
-            format(absolute_address, '032b'),
-            1,
+        if placeholder_match is not None:
+            linked_lines[source_index] = (
+                linked_lines[source_index][:placeholder_match.start()]
+                + replacement
+                + linked_lines[source_index][placeholder_match.end():]
+            )
+            continue
+
+        if instruction_format is not None and len(linked_lines[source_index]) == 64:
+            linked_lines[source_index] = patch_instruction_bits(
+                linked_lines[source_index],
+                instruction_format,
+                absolute_address,
+            )
+            continue
+
+        raise ValueError(
+            f'Relocation source {source_index} does not contain a visible placeholder'
         )
 
     for line_index, line in enumerate(linked_lines):
-        if '{dir}' in line:
+        if PLACEHOLDER_RE.search(line):
             raise ValueError(f'Unresolved relocation placeholder at line {line_index}')
 
     return linked_lines

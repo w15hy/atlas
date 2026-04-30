@@ -480,11 +480,11 @@ ENCODERS = {
 }
 
 
-def inject_placeholder(bits, instruction_format):
-    """Replace the low 8 bits of the relocatable field with {dir}."""
+def inject_placeholder(bits, instruction_format, target_address):
+    """Replace the full relocatable field with a visible address placeholder."""
     field_start, field_end = FIELD_RANGES[instruction_format]
-    placeholder_start = field_end - 8
-    return bits[:placeholder_start] + '{dir}' + bits[field_end:]
+    placeholder = f'{{0x{target_address:08X}}}'
+    return bits[:field_start] + placeholder + bits[field_end:]
 
 
 def is_numeric_token(token):
@@ -529,8 +529,9 @@ def build_instruction(instruction, labels, instruction_index):
     relocation_entry = None
 
     if relocation_target is not None:
+        bits = inject_placeholder(bits, instruction_format, relocation_target)
         relocation_entry = {
-            'source_index': current_address,
+            'source_index': instruction_index,
             'target_index': relocation_target,
             'format': instruction_format,
         }
@@ -602,7 +603,7 @@ def translate(parsed_program):
 
 
 def write_output(translated_program, output_path):
-    """Write the .binReloc file as one byte per line plus relocation metadata."""
+    """Write the .binReloc file with one instruction per line and visible placeholders."""
     parent_dir = os.path.dirname(output_path)
     if parent_dir:
         os.makedirs(parent_dir, exist_ok=True)
@@ -612,11 +613,7 @@ def write_output(translated_program, output_path):
             handle.write(f"#BASE {translated_program['base_address']}\n")
 
         for binary_line in translated_program['binary_lines']:
-            if len(binary_line) != 64:
-                raise ValueError('Assembler instructions must be 64 bits before byte splitting')
-
-            for start in range(0, 64, 8):
-                handle.write(binary_line[start:start + 8] + '\n')
+            handle.write(binary_line + '\n')
 
         handle.write('---RELOC---\n')
         for relocation in translated_program['relocations']:
