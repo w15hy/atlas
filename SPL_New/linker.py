@@ -74,18 +74,24 @@ def parse(input_path):
 
 
 def patch_instruction_bits(instruction_bits, instruction_format, absolute_address):
-    """Patch the low 8 bits of the relocatable field inside a 64-bit instruction."""
+    """Patch the full relocatable field inside a 64-bit instruction."""
     if instruction_format not in FIELD_RANGES:
         raise ValueError(f'Unsupported relocation format: {instruction_format}')
 
     if len(instruction_bits) != 64:
         raise ValueError('Instructions must be 64 bits before relocation patching')
 
-    _, field_end = FIELD_RANGES[instruction_format]
-    placeholder_start = field_end - 8
-    replacement = format(absolute_address, '08b')
+    field_start, field_end = FIELD_RANGES[instruction_format]
+    field_width = field_end - field_start
+    max_address = (1 << field_width) - 1
+    if absolute_address < 0 or absolute_address > max_address:
+        raise ValueError(
+            f'Absolute address {absolute_address} does not fit in {field_width} bits'
+        )
+
+    replacement = format(absolute_address, f'0{field_width}b')
     return (
-        instruction_bits[:placeholder_start]
+        instruction_bits[:field_start]
         + replacement
         + instruction_bits[field_end:]
     )
@@ -108,10 +114,6 @@ def translate(parsed_program):
                 raise ValueError('Byte-oriented .binReloc entries must include the format')
 
             absolute_address = parsed_program['base_address'] + target_index
-            if absolute_address < 0 or absolute_address > 255:
-                raise ValueError(
-                    f'Absolute address {absolute_address} does not fit in 8 bits'
-                )
 
             instruction_bits = ''.join(linked_lines[source_index:source_index + 8])
             instruction_bits = patch_instruction_bits(
@@ -139,14 +141,10 @@ def translate(parsed_program):
             )
 
         absolute_address = parsed_program['base_address'] + target_index
-        if absolute_address < 0 or absolute_address > 255:
-            raise ValueError(
-                f'Absolute address {absolute_address} does not fit in 8 bits'
-            )
 
         linked_lines[source_index] = linked_lines[source_index].replace(
             '{dir}',
-            format(absolute_address, '08b'),
+            format(absolute_address, '032b'),
             1,
         )
 
