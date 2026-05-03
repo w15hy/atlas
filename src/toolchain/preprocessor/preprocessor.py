@@ -1,5 +1,6 @@
 import re
 
+from toolchain.preprocessor.includes import include
 from toolchain.preprocessor.macros import (
     define_macros,
     dict_macros,
@@ -12,9 +13,10 @@ lines = ofilelines("programs/" + file)
 
 
 def main():
+    global lines
 
     # ---------------- INCLUDE ----------------
-
+    lines = include(lines, base_dir="./programs/")
     # ---------------- MACROS ----------------
     define_macros(lines)
 

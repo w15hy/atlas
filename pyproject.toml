@@ -11,5 +11,3 @@ dependencies = [
 run = "main:main"
 lexer = "toolchain.compiler.lexical_analysis.lexer:main"
 preprocessor = "toolchain.preprocessor.preprocessor:main"
-
-
