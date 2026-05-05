@@ -1,0 +1,11 @@
+def suma(){
+    return a+b;
+}
+
+def resta(){
+    return a-b;
+}
+
+def multiplicacion(){
+    return a*b;
+}

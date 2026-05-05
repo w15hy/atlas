@@ -1,0 +1,53 @@
+struct Node {
+    int id;
+    float value;
+    string name;
+};
+
+def sum(int a, int b) {
+    return a + b;
+}
+
+int main() {
+    int x = 10;
+    int y = 20;
+    float z = 3.14;
+    string msg = "full coverage test";
+
+    Node n;
+    n.id = x;
+    n.value = z;
+    n.name = "node";
+
+    int arr[5];
+    arr[0] = x;
+    arr[1] = y;
+
+    if (x > y) {
+        msg = "x greater";
+    } else if (x == y) {
+        msg = "equal";
+    } else {
+        msg = "y greater";
+    }
+
+    while (x != 0) {
+        x = x - 1;
+        if (x <= 5) {
+            break;
+        }
+    }
+
+    for (int i = 0; i < 10; i = i + 1) {
+        z = z + 0.5;
+        continue;
+    }
+
+    int a = 5 + 3 - 2 * 4 / 2;
+
+    if ((a >= 0) and (a < 100)) {
+        msg = "range";
+    }
+
+    return 0;
+}

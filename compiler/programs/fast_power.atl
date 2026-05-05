@@ -1,0 +1,20 @@
+int fast_pow(int base, int exp) {
+    int result = 1;
+    while (exp > 0) {
+        int bit = exp - (exp / 2) * 2;
+        if (bit != 0) {
+            result = result * base;
+        }
+        base = base * base;
+        exp = exp / 2;
+    }
+    return result;
+}
+
+int main() {
+    int r1 = fast_pow(2, 10);
+    print(r1);
+    int r2 = fast_pow(3, 7);
+    print(r2);
+    return 0;
+}
