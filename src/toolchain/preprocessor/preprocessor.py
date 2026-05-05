@@ -13,7 +13,10 @@ lines = ofilelines("programs/" + file)
 
 
 def main():
-    global lines
+    preprocessor(lines)
+
+
+def preprocessor(lines):
 
     # ---------------- INCLUDE ----------------
     lines = include(lines, base_dir="./programs/")
@@ -30,7 +33,7 @@ def main():
 
         lines[idx] = linea
 
-    print("".join(lines))
+    return lines
 
 
 if __name__ == "__main__":
