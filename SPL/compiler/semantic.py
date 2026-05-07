@@ -450,6 +450,10 @@ class SemanticAnalyzer:
     # -------------------- tipos --------------------
     def _resolve_type(self, type_spec):
         """Convierte el nombre de tipo del AST en el objeto de tipo correspondiente."""
+        # Marcador del parser para parámetros tipo arreglo: ('array', elem_spec).
+        if isinstance(type_spec, tuple) and type_spec and type_spec[0] == "array":
+            elem = self._resolve_type(type_spec[1])
+            return ArrayType(elem, size=None, is_pointer=True)
         if type_spec in (INT, FLOAT, STRING, VOID):
             return type_spec
         # 'def' es el keyword de función sin tipo explícito (lo lexea como ID).

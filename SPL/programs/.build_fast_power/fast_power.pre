@@ -16,4 +16,4 @@ int main() {
     int r2 = fast_pow(3, 7);
     print(r2);
     return 0;
-}
+} 

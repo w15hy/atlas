@@ -1,10 +1,12 @@
+#include <vecmat.atl>
+
 struct Node {
     int id;
     float value;
     string name;
 };
 
-def sum(int a, int b) {
+int sum(int a, int b) {
     return a + b;
 }
 
@@ -19,9 +21,27 @@ int main() {
     n.value = z;
     n.name = "node";
 
-    int arr[5];
-    arr[0] = x;
-    arr[1] = y;
+    # ----------------------------------------------------------------------
+    # Antes: int arr[5]; arr[0] = x; arr[1] = y;  (manejo manual de arreglo)
+    # Ahora: usamos la biblioteca vecmat para tratar el arreglo como vector.
+    # arr almacena la cabecera (longitud) en arr[0] y los 5 datos en arr[1..5].
+    # 8 bytes por dato (loadw/storew); declaramos 5 + 1 = 6 slots.
+    # ----------------------------------------------------------------------
+    int arr[6];
+    vec_init(arr, 5);
+    vec_fill(arr, 0);
+    vec_set(arr, 0, x);
+    vec_set(arr, 1, y);
+    vec_set(arr, 2, sum(x, y));
+    vec_set(arr, 3, x * 2);
+    vec_set(arr, 4, y * 2);
+
+    print(vec_len(arr));     # 5
+    print(vec_get(arr, 0));  # 10
+    print(vec_get(arr, 1));  # 20
+    print(vec_sum(arr));     # 10 + 20 + 30 + 20 + 40 = 120
+    print(vec_max(arr));     # 40
+    print(vec_min(arr));     # 10
 
     if (x > y) {
         msg = "x greater";
@@ -30,6 +50,7 @@ int main() {
     } else {
         msg = "y greater";
     }
+    print(msg);
 
     while (x != 0) {
         x = x - 1;
@@ -44,10 +65,10 @@ int main() {
     }
 
     int a = 5 + 3 - 2 * 4 / 2;
-
     if ((a >= 0) and (a < 100)) {
         msg = "range";
     }
+    print(msg);
 
     return 0;
 }

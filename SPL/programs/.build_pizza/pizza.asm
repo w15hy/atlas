@@ -1,0 +1,34 @@
+# ========================================================================
+#   Compilado por Atlas Compiler - codegen
+#   code=[0..152)  data=[152..160)  strings=[160..60000)  SP=60000
+# ========================================================================
+.org 0
+
+    call main
+    halt
+
+# 
+# --- funcion main() ---
+main:
+    mov R6, 160    # &"messi"
+    out R6    # print
+    mov R7, 0
+    mov R8, 777
+    mov R9, 888
+    add R8, R9
+    mov R10, 999
+    add R8, R10
+    mov R11, 1000
+    add R8, R11
+    storew R8, 152    # a = ...
+    loadw R12, 152    # a
+    out R12    # print
+    mov R13, 0
+    mov R6, 0
+    mov R0, R6    # valor de retorno
+    ret
+# 
+# ------------------------------------------------------------------------
+#  Tabla de strings (direcciones absolutas)
+# ------------------------------------------------------------------------
+#   [160] = 'messi'

@@ -36,14 +36,20 @@ class StructType:
 
 
 class ArrayType:
-    """Tipo arreglo: tipo de elemento + tamaño (None si no se conoce)."""
+    """Tipo arreglo: tipo de elemento + tamaño (None si no se conoce).
 
-    def __init__(self, element_type, size=None):
+    Cuando is_pointer es True, el arreglo se trata como un parámetro:
+    su slot guarda la dirección base (8 bytes) en lugar de los datos.
+    """
+
+    def __init__(self, element_type, size=None, is_pointer=False):
         self.element_type = element_type
         self.size = size
+        self.is_pointer = is_pointer
 
     def __repr__(self):
-        return f"{self.element_type}[{self.size if self.size is not None else ''}]"
+        suffix = "*" if self.is_pointer else ""
+        return f"{self.element_type}[{self.size if self.size is not None else ''}]{suffix}"
 
 
 def is_numeric(t):
@@ -67,6 +73,12 @@ def is_assignable(target, source):
     # 'any' es comodín bidireccional (entra cuando el tipo viene del 'def' implícito).
     if target == ANY or source == ANY:
         return True
+    # Un arreglo concreto puede pasarse a un parámetro tipo arreglo (puntero)
+    # del mismo tipo de elemento. Esto habilita libs como vec/mat operando
+    # sobre arreglos del usuario sin copiarlos.
+    if isinstance(target, ArrayType) and isinstance(source, ArrayType):
+        if target.element_type == source.element_type:
+            return True
     return False
 
 

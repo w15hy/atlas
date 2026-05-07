@@ -1,0 +1,244 @@
+# ============================================================================
+# stdlib/vecmat.atl — Biblioteca de Vectores y Matrices de Atlas SPL
+# ============================================================================
+#
+# Uso:
+#     #include <vecmat.atl>
+#
+# Convencion de almacenamiento (8 bytes / 64 bits por dato):
+#
+#   VECTOR (longitud N):
+#       v[0]            = N            (cabecera con la longitud)
+#       v[1] .. v[N]    = elementos    (N datos contiguos)
+#       --> el usuario debe declarar  int v[N + 1];
+#
+#   MATRIZ (filas R x columnas C):
+#       m[0]            = R            (cabecera fila 0)
+#       m[1]            = C            (cabecera fila 1)
+#       m[2] .. m[1+R*C]= datos en row-major
+#       --> el usuario debe declarar  int m[R * C + 2];
+#
+# Las funciones reciben los arreglos como punteros (sintaxis  int v[]) y
+# operan sobre la memoria del usuario sin copias.
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# VECTORES
+# ----------------------------------------------------------------------------
+
+# Inicializa la cabecera del vector con la longitud N.
+void vec_init(int v[], int n) {
+    v[0] = n;
+}
+
+# Devuelve la longitud almacenada en la cabecera.
+int vec_len(int v[]) {
+    return v[0];
+}
+
+# Lee el elemento en la posicion i (0-based).
+int vec_get(int v[], int i) {
+    return v[i + 1];
+}
+
+# Escribe el elemento en la posicion i.
+void vec_set(int v[], int i, int val) {
+    v[i + 1] = val;
+}
+
+# Rellena los N elementos con un valor fijo.
+void vec_fill(int v[], int val) {
+    int n = v[0];
+    int i = 0;
+    while (i < n) {
+        v[i + 1] = val;
+        i = i + 1;
+    }
+}
+
+# Suma todos los elementos.
+int vec_sum(int v[]) {
+    int n = v[0];
+    int s = 0;
+    int i = 0;
+    while (i < n) {
+        s = s + v[i + 1];
+        i = i + 1;
+    }
+    return s;
+}
+
+# Producto punto (asume misma longitud almacenada en a).
+int vec_dot(int a[], int b[]) {
+    int n = a[0];
+    int s = 0;
+    int i = 0;
+    while (i < n) {
+        s = s + a[i + 1] * b[i + 1];
+        i = i + 1;
+    }
+    return s;
+}
+
+# Suma elemento a elemento: a[i] = a[i] + b[i].
+void vec_add(int a[], int b[]) {
+    int n = a[0];
+    int i = 0;
+    while (i < n) {
+        a[i + 1] = a[i + 1] + b[i + 1];
+        i = i + 1;
+    }
+}
+
+# Resta elemento a elemento: a[i] = a[i] - b[i].
+void vec_sub(int a[], int b[]) {
+    int n = a[0];
+    int i = 0;
+    while (i < n) {
+        a[i + 1] = a[i + 1] - b[i + 1];
+        i = i + 1;
+    }
+}
+
+# Escala todos los elementos por una constante k.
+void vec_scale(int v[], int k) {
+    int n = v[0];
+    int i = 0;
+    while (i < n) {
+        v[i + 1] = v[i + 1] * k;
+        i = i + 1;
+    }
+}
+
+# Devuelve el maximo de los elementos (vector no vacio).
+int vec_max(int v[]) {
+    int n = v[0];
+    int m = v[1];
+    int i = 1;
+    while (i < n) {
+        if (v[i + 1] > m) {
+            m = v[i + 1];
+        }
+        i = i + 1;
+    }
+    return m;
+}
+
+# Devuelve el minimo de los elementos (vector no vacio).
+int vec_min(int v[]) {
+    int n = v[0];
+    int m = v[1];
+    int i = 1;
+    while (i < n) {
+        if (v[i + 1] < m) {
+            m = v[i + 1];
+        }
+        i = i + 1;
+    }
+    return m;
+}
+
+# Copia src sobre dst (incluyendo la cabecera).
+void vec_copy(int dst[], int src[]) {
+    int n = src[0];
+    dst[0] = n;
+    int i = 0;
+    while (i < n) {
+        dst[i + 1] = src[i + 1];
+        i = i + 1;
+    }
+}
+
+# Imprime los elementos del vector uno por linea.
+void vec_print(int v[]) {
+    int n = v[0];
+    int i = 0;
+    while (i < n) {
+        print(v[i + 1]);
+        i = i + 1;
+    }
+}
+
+# ----------------------------------------------------------------------------
+# MATRICES (almacenamiento row-major con cabecera de 2 enteros)
+# ----------------------------------------------------------------------------
+
+# Escribe la cabecera (filas, columnas).
+void mat_init(int m[], int rows, int cols) {
+    m[0] = rows;
+    m[1] = cols;
+}
+
+# Numero de filas.
+int mat_rows(int m[]) {
+    return m[0];
+}
+
+# Numero de columnas.
+int mat_cols(int m[]) {
+    return m[1];
+}
+
+# Lee m[i][j].
+int mat_get(int m[], int i, int j) {
+    int cols = m[1];
+    return m[i * cols + j + 2];
+}
+
+# Escribe m[i][j] = val.
+void mat_set(int m[], int i, int j, int val) {
+    int cols = m[1];
+    m[i * cols + j + 2] = val;
+}
+
+# Rellena toda la matriz con un valor fijo.
+void mat_fill(int m[], int val) {
+    int rows = m[0];
+    int cols = m[1];
+    int total = rows * cols;
+    int k = 0;
+    while (k < total) {
+        m[k + 2] = val;
+        k = k + 1;
+    }
+}
+
+# Multiplicacion de matrices: c = a * b.
+# Requiere que cols(a) == rows(b). c se inicializa con (rows(a), cols(b)).
+void mat_mul(int a[], int b[], int c[]) {
+    int ar = a[0];
+    int ac = a[1];
+    int bc = b[1];
+    c[0] = ar;
+    c[1] = bc;
+    int i = 0;
+    while (i < ar) {
+        int j = 0;
+        while (j < bc) {
+            int acc = 0;
+            int k = 0;
+            while (k < ac) {
+                acc = acc + a[i * ac + k + 2] * b[k * bc + j + 2];
+                k = k + 1;
+            }
+            c[i * bc + j + 2] = acc;
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+}
+
+# Imprime la matriz fila por fila (cada elemento en una linea).
+void mat_print(int m[]) {
+    int rows = m[0];
+    int cols = m[1];
+    int i = 0;
+    while (i < rows) {
+        int j = 0;
+        while (j < cols) {
+            print(m[i * cols + j + 2]);
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+}

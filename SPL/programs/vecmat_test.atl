@@ -1,0 +1,97 @@
+#include <vecmat.atl>
+
+# ============================================================================
+# Test exhaustivo de la biblioteca vecmat.atl.
+# Cada print muestra el valor calculado y al lado se anota el esperado.
+# ============================================================================
+
+int main() {
+    # ── Vector v de longitud 5 ──────────────────────────────────────────
+    int v[6];
+    vec_init(v, 5);
+    vec_fill(v, 0);
+
+    print(vec_len(v));      # 5
+
+    vec_set(v, 0, 10);
+    vec_set(v, 1, 20);
+    vec_set(v, 2, 30);
+    vec_set(v, 3, 40);
+    vec_set(v, 4, 50);
+
+    print(vec_get(v, 0));   # 10
+    print(vec_get(v, 4));   # 50
+    print(vec_sum(v));      # 150
+    print(vec_max(v));      # 50
+    print(vec_min(v));      # 10
+
+    # ── Vector w (copia + escala) ───────────────────────────────────────
+    int w[6];
+    vec_copy(w, v);
+    print(vec_len(w));      # 5
+    print(vec_sum(w));      # 150
+
+    vec_scale(w, 2);
+    print(vec_get(w, 0));   # 20
+    print(vec_get(w, 4));   # 100
+    print(vec_sum(w));      # 300
+
+    # ── Producto punto ──────────────────────────────────────────────────
+    # v . v = 100 + 400 + 900 + 1600 + 2500 = 5500
+    print(vec_dot(v, v));
+
+    # ── Suma de vectores: v += v  ⇒ duplicar v ─────────────────────────
+    vec_add(v, v);
+    print(vec_get(v, 0));   # 20
+    print(vec_get(v, 4));   # 100
+    print(vec_sum(v));      # 300
+
+    # ── Resta: v -= w  ⇒ v queda en 0  (v=300, w=300) ──────────────────
+    vec_sub(v, w);
+    print(vec_sum(v));      # 0
+
+    # ── Matriz 2x3 A ────────────────────────────────────────────────────
+    #   1 2 3
+    #   4 5 6
+    int A[8];           # 2*3 + 2 = 8
+    mat_init(A, 2, 3);
+    mat_set(A, 0, 0, 1); mat_set(A, 0, 1, 2); mat_set(A, 0, 2, 3);
+    mat_set(A, 1, 0, 4); mat_set(A, 1, 1, 5); mat_set(A, 1, 2, 6);
+
+    print(mat_rows(A));     # 2
+    print(mat_cols(A));     # 3
+    print(mat_get(A, 0, 0));# 1
+    print(mat_get(A, 1, 2));# 6
+
+    # ── Matriz 3x2 B ────────────────────────────────────────────────────
+    #   7  8
+    #   9  10
+    #  11  12
+    int B[8];
+    mat_init(B, 3, 2);
+    mat_set(B, 0, 0, 7);  mat_set(B, 0, 1, 8);
+    mat_set(B, 1, 0, 9);  mat_set(B, 1, 1, 10);
+    mat_set(B, 2, 0, 11); mat_set(B, 2, 1, 12);
+
+    # ── C = A * B  (2x2) ────────────────────────────────────────────────
+    #   1*7+2*9+3*11   1*8+2*10+3*12   =   58   64
+    #   4*7+5*9+6*11   4*8+5*10+6*12   =  139  154
+    int C[6];
+    mat_mul(A, B, C);
+
+    print(mat_rows(C));         # 2
+    print(mat_cols(C));         # 2
+    print(mat_get(C, 0, 0));    # 58
+    print(mat_get(C, 0, 1));    # 64
+    print(mat_get(C, 1, 0));    # 139
+    print(mat_get(C, 1, 1));    # 154
+
+    # ── mat_fill ────────────────────────────────────────────────────────
+    int F[6];
+    mat_init(F, 2, 2);
+    mat_fill(F, 7);
+    print(mat_get(F, 0, 0));    # 7
+    print(mat_get(F, 1, 1));    # 7
+
+    return 0;
+}

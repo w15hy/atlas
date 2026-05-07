@@ -176,8 +176,13 @@ def p_param_list(p):
 
 
 def p_param(p):
-    """param : type_spec ID"""
-    p[0] = (p[1], p[2])
+    """param : type_spec ID
+    | type_spec ID LBRACKET RBRACKET"""
+    if len(p) == 3:
+        p[0] = (p[1], p[2])
+    else:
+        # Marcador de parámetro tipo arreglo (puntero a base).
+        p[0] = (("array", p[1]), p[2])
 
 
 # ------------------ TIPOS ------------------

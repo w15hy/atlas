@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python pipeline.py programs/math_test.atl)",
+      "Bash(python pipeline.py programs/strings_test.atl)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)",
+      "Bash(python pipeline.py programs/vecmat_test.atl)",
+      "Bash(python pipeline.py programs/main.atl)",
+      "Bash(python main.py SPL/programs/.build_vecmat_test/vecmat_test.bin)",
+      "Bash(python main.py SPL/programs/.build_main/main.bin)",
+      "Bash(grep -E \"^\\\\[OUT\\\\]|^[0-9]+\\\\.[0-9]+$\")",
+      "Bash(cd SPL && python pipeline.py programs/vecmat_test.atl 2>&1 | tail -5 && cd .. && echo \"1\" | python main.py SPL/programs/.build_vecmat_test/vecmat_test.bin 2>&1 | grep -E \"^\\\\[OUT\\\\]|^[0-9]+\\\\.[0-9]+$\")",
+      "Read(//c/Users/asdva/OneDrive/Documentos/Visual/Maquina/**)",
+      "Bash(python pipeline.py programs/__TRACKED_VAR__.atl)"
+    ]
+  }
+}

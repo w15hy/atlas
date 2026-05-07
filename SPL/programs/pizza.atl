@@ -1,0 +1,6 @@
+int main() {
+    print("messi");
+    int a = 777 + 888 + 999 + 1000;
+    print(a);
+    return 0;
+}

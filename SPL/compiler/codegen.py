@@ -265,6 +265,7 @@ class CodeGenerator:
             _, fname, params, block, _ret = s
             for ptype, pname in params:
                 rtype = self._resolve_type(ptype)
+                # Parámetros arreglo guardan solo la dirección base (8 bytes).
                 self._alloc_var(f"{fname}::{pname}", WORD_SIZE, rtype)
             self._prealloc_block(block, prefix=f"{fname}::")
         elif tag == "if":
@@ -306,6 +307,10 @@ class CodeGenerator:
         return WORD_SIZE
 
     def _resolve_type(self, ttype):
+        # Marcador del parser para parámetros tipo arreglo.
+        if isinstance(ttype, tuple) and ttype and ttype[0] == "array":
+            elem = self._resolve_type(ttype[1])
+            return ArrayType(elem, size=None, is_pointer=True)
         if ttype in (INT, FLOAT, STRING):
             return ttype
         st = self.table.lookup_struct(ttype)
@@ -356,10 +361,18 @@ class CodeGenerator:
     def _gs_assign_index(self, s):
         _, name, idx_expr, expr = s
         base_offset = self._addr_of(name)
+        vtype = self._type_of(name)
         ridx = self._gen_expr(idx_expr)
         rval = self._gen_expr(expr)
         self._emit(f"    muli R{ridx}, {WORD_SIZE}    # idx * word")
-        self._emit(f"    addi R{ridx}, {self._da(base_offset)}    # +base de {name}")
+        if isinstance(vtype, ArrayType) and vtype.is_pointer:
+            # Parámetro arreglo: el slot guarda la dirección base.
+            rbase = self._alloc_reg()
+            self._emit(f"    loadw R{rbase}, {self._da(base_offset)}    # base de {name} (ptr)")
+            self._emit(f"    add R{ridx}, R{rbase}    # idx*word + base")
+            self._free_reg(rbase)
+        else:
+            self._emit(f"    addi R{ridx}, {self._da(base_offset)}    # +base de {name}")
         self._emit(f"    storew R{rval}, R{ridx}    # {name}[idx] = ...")
         self._free_reg(ridx)
         self._free_reg(rval)
@@ -496,8 +509,15 @@ class CodeGenerator:
     def _ge_id(self, expr):
         name = expr[1]
         offset = self._addr_of(name)
+        vtype = self._type_of(name)
         r = self._alloc_reg()
-        self._emit(f"    loadw R{r}, {self._da(offset)}    # {name}")
+        if isinstance(vtype, ArrayType) and not vtype.is_pointer:
+            # Arreglo declarado localmente: el "valor" del nombre es la
+            # dirección base del buffer.
+            self._emit(f"    mov R{r}, {self._da(offset)}    # &{name}")
+        else:
+            # Escalar o parámetro arreglo (slot guarda la dirección).
+            self._emit(f"    loadw R{r}, {self._da(offset)}    # {name}")
         return r
 
     def _ge_attr(self, expr):
@@ -510,9 +530,16 @@ class CodeGenerator:
     def _ge_index(self, expr):
         _, name, idx = expr
         base_offset = self._addr_of(name)
+        vtype = self._type_of(name)
         ridx = self._gen_expr(idx)
         self._emit(f"    muli R{ridx}, {WORD_SIZE}")
-        self._emit(f"    addi R{ridx}, {self._da(base_offset)}")
+        if isinstance(vtype, ArrayType) and vtype.is_pointer:
+            rbase = self._alloc_reg()
+            self._emit(f"    loadw R{rbase}, {self._da(base_offset)}    # base de {name} (ptr)")
+            self._emit(f"    add R{ridx}, R{rbase}")
+            self._free_reg(rbase)
+        else:
+            self._emit(f"    addi R{ridx}, {self._da(base_offset)}")
         rdst = self._alloc_reg()
         self._emit(f"    loadw R{rdst}, R{ridx}    # {name}[idx]")
         self._free_reg(ridx)
@@ -671,13 +698,18 @@ class CodeGenerator:
             raise CodeGenError(
                 f"Llamada a '{name}' con mas de 6 argumentos no soportada"
             )
-        evaluated = []
+        # Cada argumento se evalúa y se vuelca a la pila inmediatamente.
+        # Esto preserva los argumentos ya evaluados ante llamadas anidadas
+        # dentro de la evaluación de los argumentos siguientes (las funciones
+        # clobbean R6..R13 sin avisar; sin spill perderíamos esos valores).
         for a in args:
-            evaluated.append(self._gen_expr(a))
-        for i, src in enumerate(evaluated):
-            if src != i:
-                self._emit(f"    mov R{i}, R{src}    # arg{i+1}")
-            self._free_reg(src)
+            r = self._gen_expr(a)
+            self._emit(f"    push R{r}    # spill arg para {name}")
+            self._free_reg(r)
+        # Recuperar en R(N-1)..R0 (orden inverso al push) para que el
+        # primer argumento quede en R0.
+        for i in range(len(args) - 1, -1, -1):
+            self._emit(f"    pop R{i}    # arg{i + 1}")
         self._emit(f"    call {name}")
         rdst = self._alloc_reg()
         if rdst != 0:
