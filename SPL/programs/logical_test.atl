@@ -1,0 +1,48 @@
+int main() {
+    int a = 5;
+    int b = 3;
+    int c = 0;
+
+    # Unary ! : !c donde c=0 => true, imprime 1
+    if (!c) {
+        print(1);
+    }
+
+    # Unary ! : !a donde a=5 => false, NO imprime 99
+    if (!a) {
+        print(99);
+    }
+
+    # Precedencia && > ||:
+    # a>0 || b>10 && c>0
+    # correcto  : a>0 || (b>10 && c>0) = true || false = true  -> imprime 2
+    # incorrecto: (a>0 || b>10) && c>0 = true && false = false -> no imprimia nada
+    if (a > 0 || b > 10 && c > 0) {
+        print(2);
+    }
+
+    # C-style && equivale a 'and'
+    if (a > b && a > 0) {
+        print(3);
+    }
+
+    if (a > b and a > 0) {
+        print(4);
+    }
+
+    # C-style || equivale a 'or'
+    if (c > 0 || a > 0) {
+        print(5);
+    }
+
+    if (c > 0 or a > 0) {
+        print(6);
+    }
+
+    # Doble negacion: !!a donde a=5 => !!5 = !false = true -> imprime 7
+    if (!!a) {
+        print(7);
+    }
+
+    return 0;
+}

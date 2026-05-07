@@ -59,56 +59,60 @@ Rule 53    expr -> expr MINUS expr
 Rule 54    expr -> expr TIMES expr
 Rule 55    expr -> expr DIVIDE expr
 Rule 56    expr -> expr RELOP expr
-Rule 57    expr -> expr LOGOP expr
-Rule 58    expr -> expr AND expr
-Rule 59    expr -> expr OR expr
-Rule 60    expr -> NOT expr
-Rule 61    expr -> MINUS expr
-Rule 62    expr -> LPAREN expr RPAREN
-Rule 63    expr -> ID LBRACKET expr RBRACKET
-Rule 64    expr -> NUMBER
-Rule 65    expr -> STRLIT
-Rule 66    expr -> ID
-Rule 67    expr -> ID DOT ID
-Rule 68    expr -> ID LPAREN arg_list RPAREN
-Rule 69    arg_list -> arg_list COMA expr
-Rule 70    arg_list -> expr
-Rule 71    arg_list -> empty
-Rule 72    empty -> <empty>
+Rule 57    expr -> expr AND_OP expr
+Rule 58    expr -> expr OR_OP expr
+Rule 59    expr -> BANG expr
+Rule 60    expr -> expr AND expr
+Rule 61    expr -> expr OR expr
+Rule 62    expr -> NOT expr
+Rule 63    expr -> MINUS expr
+Rule 64    expr -> LPAREN expr RPAREN
+Rule 65    expr -> ID LBRACKET expr RBRACKET
+Rule 66    expr -> NUMBER
+Rule 67    expr -> STRLIT
+Rule 68    expr -> ID
+Rule 69    expr -> ID DOT ID
+Rule 70    expr -> ID LPAREN arg_list RPAREN
+Rule 71    arg_list -> arg_list COMA expr
+Rule 72    arg_list -> expr
+Rule 73    arg_list -> empty
+Rule 74    empty -> <empty>
 
 Terminals, with rules where they appear
 
-AND                  : 58
+AND                  : 60
+AND_OP               : 57
 ASSIGN               : 16 18 19 20
+BANG                 : 59
 BREAK                : 24
-COMA                 : 38 69
+COMA                 : 38 71
 CONTINUE             : 25
 DIVIDE               : 55
-DOT                  : 19 67
+DOT                  : 19 69
 ELIF                 : 27
 ELSE                 : 28 30
 FLOAT                : 43
 FOR                  : 33
-ID                   : 15 16 17 18 19 19 20 36 37 41 45 46 47 48 63 66 67 67 68
+ID                   : 15 16 17 18 19 19 20 36 37 41 45 46 47 48 65 68 69 69 70
 IF                   : 26 28
 INT                  : 42
 LBRACE               : 46 47 50 51
-LBRACKET             : 17 20 63
-LOGOP                : 57
-LPAREN               : 26 27 28 32 33 36 37 62 68
-MINUS                : 53 61
-NOT                  : 60
-NUMBER               : 64
-OR                   : 59
+LBRACKET             : 17 20 65
+LPAREN               : 26 27 28 32 33 36 37 64 70
+MINUS                : 53 63
+NOT                  : 62
+NUMBER               : 66
+OR                   : 61
+OR_OP                : 58
 PLUS                 : 52
 RBRACE               : 46 47 50 51
-RBRACKET             : 17 20 63
+RBRACKET             : 17 20 65
 RELOP                : 56
 RETURN               : 22 23
-RPAREN               : 26 27 28 32 33 36 37 62 68
+RPAREN               : 26 27 28 32 33 36 37 64 70
 SEMI                 : 4 5 6 7 8 9 33 33 46 48
 STRING_TYPE          : 44
-STRLIT               : 65
+STRLIT               : 67
 STRUCT               : 46 47
 TIMES                : 54
 VOID                 : 36
@@ -117,7 +121,7 @@ error                :
 
 Nonterminals, with rules where they appear
 
-arg_list             : 68 69
+arg_list             : 70 71
 assign_stmt          : 5 33 35
 block                : 26 27 28 30 32 33 36 37
 break_stmt           : 7
@@ -125,8 +129,8 @@ continue_stmt        : 8
 decl_stmt            : 4 34
 elif_chain           : 26 27 28
 else_block           : 26
-empty                : 29 31 40 49 71
-expr                 : 16 17 18 19 20 20 21 22 26 27 28 32 33 52 52 53 53 54 54 55 55 56 56 57 57 58 58 59 59 60 61 62 63 69 70
+empty                : 29 31 40 49 73
+expr                 : 16 17 18 19 20 20 21 22 26 27 28 32 33 52 52 53 53 54 54 55 55 56 56 57 57 58 58 59 60 60 61 61 62 63 64 65 71 72
 expr_stmt            : 9
 for_init             : 33
 for_stmt             : 12
@@ -189,18 +193,20 @@ state 0
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
     ID              shift and go to state 16
     RETURN          shift and go to state 18
@@ -214,11 +220,12 @@ state 0
     INT             shift and go to state 27
     FLOAT           shift and go to state 28
     STRING_TYPE     shift and go to state 29
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
     program                        shift and go to state 1
     statement_list                 shift and go to state 2
@@ -285,18 +292,20 @@ state 2
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
     $end            reduce using rule 1 (program -> statement_list .)
     ID              shift and go to state 16
@@ -311,13 +320,14 @@ state 2
     INT             shift and go to state 27
     FLOAT           shift and go to state 28
     STRING_TYPE     shift and go to state 29
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    statement                      shift and go to state 34
+    statement                      shift and go to state 35
     decl_stmt                      shift and go to state 4
     assign_stmt                    shift and go to state 5
     return_stmt                    shift and go to state 6
@@ -348,6 +358,7 @@ state 3
     INT             reduce using rule 3 (statement_list -> statement .)
     FLOAT           reduce using rule 3 (statement_list -> statement .)
     STRING_TYPE     reduce using rule 3 (statement_list -> statement .)
+    BANG            reduce using rule 3 (statement_list -> statement .)
     NOT             reduce using rule 3 (statement_list -> statement .)
     MINUS           reduce using rule 3 (statement_list -> statement .)
     LPAREN          reduce using rule 3 (statement_list -> statement .)
@@ -361,42 +372,42 @@ state 4
 
     (4) statement -> decl_stmt . SEMI
 
-    SEMI            shift and go to state 35
+    SEMI            shift and go to state 36
 
 
 state 5
 
     (5) statement -> assign_stmt . SEMI
 
-    SEMI            shift and go to state 36
+    SEMI            shift and go to state 37
 
 
 state 6
 
     (6) statement -> return_stmt . SEMI
 
-    SEMI            shift and go to state 37
+    SEMI            shift and go to state 38
 
 
 state 7
 
     (7) statement -> break_stmt . SEMI
 
-    SEMI            shift and go to state 38
+    SEMI            shift and go to state 39
 
 
 state 8
 
     (8) statement -> continue_stmt . SEMI
 
-    SEMI            shift and go to state 39
+    SEMI            shift and go to state 40
 
 
 state 9
 
     (9) statement -> expr_stmt . SEMI
 
-    SEMI            shift and go to state 40
+    SEMI            shift and go to state 41
 
 
 state 10
@@ -415,6 +426,7 @@ state 10
     INT             reduce using rule 10 (statement -> if_stmt .)
     FLOAT           reduce using rule 10 (statement -> if_stmt .)
     STRING_TYPE     reduce using rule 10 (statement -> if_stmt .)
+    BANG            reduce using rule 10 (statement -> if_stmt .)
     NOT             reduce using rule 10 (statement -> if_stmt .)
     MINUS           reduce using rule 10 (statement -> if_stmt .)
     LPAREN          reduce using rule 10 (statement -> if_stmt .)
@@ -440,6 +452,7 @@ state 11
     INT             reduce using rule 11 (statement -> while_stmt .)
     FLOAT           reduce using rule 11 (statement -> while_stmt .)
     STRING_TYPE     reduce using rule 11 (statement -> while_stmt .)
+    BANG            reduce using rule 11 (statement -> while_stmt .)
     NOT             reduce using rule 11 (statement -> while_stmt .)
     MINUS           reduce using rule 11 (statement -> while_stmt .)
     LPAREN          reduce using rule 11 (statement -> while_stmt .)
@@ -465,6 +478,7 @@ state 12
     INT             reduce using rule 12 (statement -> for_stmt .)
     FLOAT           reduce using rule 12 (statement -> for_stmt .)
     STRING_TYPE     reduce using rule 12 (statement -> for_stmt .)
+    BANG            reduce using rule 12 (statement -> for_stmt .)
     NOT             reduce using rule 12 (statement -> for_stmt .)
     MINUS           reduce using rule 12 (statement -> for_stmt .)
     LPAREN          reduce using rule 12 (statement -> for_stmt .)
@@ -490,6 +504,7 @@ state 13
     INT             reduce using rule 13 (statement -> func_def .)
     FLOAT           reduce using rule 13 (statement -> func_def .)
     STRING_TYPE     reduce using rule 13 (statement -> func_def .)
+    BANG            reduce using rule 13 (statement -> func_def .)
     NOT             reduce using rule 13 (statement -> func_def .)
     MINUS           reduce using rule 13 (statement -> func_def .)
     LPAREN          reduce using rule 13 (statement -> func_def .)
@@ -515,6 +530,7 @@ state 14
     INT             reduce using rule 14 (statement -> struct_def .)
     FLOAT           reduce using rule 14 (statement -> struct_def .)
     STRING_TYPE     reduce using rule 14 (statement -> struct_def .)
+    BANG            reduce using rule 14 (statement -> struct_def .)
     NOT             reduce using rule 14 (statement -> struct_def .)
     MINUS           reduce using rule 14 (statement -> struct_def .)
     LPAREN          reduce using rule 14 (statement -> struct_def .)
@@ -531,7 +547,7 @@ state 15
     (17) decl_stmt -> type_spec . ID LBRACKET expr RBRACKET
     (37) func_def -> type_spec . ID LPAREN param_list RPAREN block
 
-    ID              shift and go to state 41
+    ID              shift and go to state 42
 
 
 state 16
@@ -540,25 +556,26 @@ state 16
     (19) assign_stmt -> ID . DOT ID ASSIGN expr
     (20) assign_stmt -> ID . LBRACKET expr RBRACKET ASSIGN expr
     (45) type_spec -> ID .
-    (63) expr -> ID . LBRACKET expr RBRACKET
-    (66) expr -> ID .
-    (67) expr -> ID . DOT ID
-    (68) expr -> ID . LPAREN arg_list RPAREN
+    (65) expr -> ID . LBRACKET expr RBRACKET
+    (68) expr -> ID .
+    (69) expr -> ID . DOT ID
+    (70) expr -> ID . LPAREN arg_list RPAREN
 
-    ASSIGN          shift and go to state 42
-    DOT             shift and go to state 43
-    LBRACKET        shift and go to state 44
+    ASSIGN          shift and go to state 43
+    DOT             shift and go to state 44
+    LBRACKET        shift and go to state 45
     ID              reduce using rule 45 (type_spec -> ID .)
-    PLUS            reduce using rule 66 (expr -> ID .)
-    MINUS           reduce using rule 66 (expr -> ID .)
-    TIMES           reduce using rule 66 (expr -> ID .)
-    DIVIDE          reduce using rule 66 (expr -> ID .)
-    RELOP           reduce using rule 66 (expr -> ID .)
-    LOGOP           reduce using rule 66 (expr -> ID .)
-    AND             reduce using rule 66 (expr -> ID .)
-    OR              reduce using rule 66 (expr -> ID .)
-    SEMI            reduce using rule 66 (expr -> ID .)
-    LPAREN          shift and go to state 45
+    PLUS            reduce using rule 68 (expr -> ID .)
+    MINUS           reduce using rule 68 (expr -> ID .)
+    TIMES           reduce using rule 68 (expr -> ID .)
+    DIVIDE          reduce using rule 68 (expr -> ID .)
+    RELOP           reduce using rule 68 (expr -> ID .)
+    AND_OP          reduce using rule 68 (expr -> ID .)
+    OR_OP           reduce using rule 68 (expr -> ID .)
+    AND             reduce using rule 68 (expr -> ID .)
+    OR              reduce using rule 68 (expr -> ID .)
+    SEMI            reduce using rule 68 (expr -> ID .)
+    LPAREN          shift and go to state 46
 
 
 state 17
@@ -569,19 +586,21 @@ state 17
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     SEMI            reduce using rule 21 (expr_stmt -> expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
 state 18
@@ -593,28 +612,31 @@ state 18
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
     SEMI            reduce using rule 23 (return_stmt -> RETURN .)
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 54
+    expr                           shift and go to state 56
 
 state 19
 
@@ -634,58 +656,61 @@ state 21
 
     (26) if_stmt -> IF . LPAREN expr RPAREN block elif_chain else_block
 
-    LPAREN          shift and go to state 56
+    LPAREN          shift and go to state 58
 
 
 state 22
 
-    (62) expr -> LPAREN . expr RPAREN
+    (64) expr -> LPAREN . expr RPAREN
     (52) expr -> . expr PLUS expr
     (53) expr -> . expr MINUS expr
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 57
+    expr                           shift and go to state 59
 
 state 23
 
     (32) while_stmt -> WHILE . LPAREN expr RPAREN block
 
-    LPAREN          shift and go to state 58
+    LPAREN          shift and go to state 60
 
 
 state 24
 
     (33) for_stmt -> FOR . LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block
 
-    LPAREN          shift and go to state 59
+    LPAREN          shift and go to state 61
 
 
 state 25
 
     (36) func_def -> VOID . ID LPAREN param_list RPAREN block
 
-    ID              shift and go to state 60
+    ID              shift and go to state 62
 
 
 state 26
@@ -693,7 +718,7 @@ state 26
     (46) struct_def -> STRUCT . ID LBRACE struct_body RBRACE SEMI
     (47) struct_def -> STRUCT . ID LBRACE struct_body RBRACE
 
-    ID              shift and go to state 61
+    ID              shift and go to state 63
 
 
 state 27
@@ -719,101 +744,142 @@ state 29
 
 state 30
 
-    (61) expr -> MINUS . expr
+    (63) expr -> MINUS . expr
     (52) expr -> . expr PLUS expr
     (53) expr -> . expr MINUS expr
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 62
+    expr                           shift and go to state 64
 
 state 31
 
-    (60) expr -> NOT . expr
+    (59) expr -> BANG . expr
     (52) expr -> . expr PLUS expr
     (53) expr -> . expr MINUS expr
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 63
+    expr                           shift and go to state 65
 
 state 32
 
-    (64) expr -> NUMBER .
+    (62) expr -> NOT . expr
+    (52) expr -> . expr PLUS expr
+    (53) expr -> . expr MINUS expr
+    (54) expr -> . expr TIMES expr
+    (55) expr -> . expr DIVIDE expr
+    (56) expr -> . expr RELOP expr
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    PLUS            reduce using rule 64 (expr -> NUMBER .)
-    MINUS           reduce using rule 64 (expr -> NUMBER .)
-    TIMES           reduce using rule 64 (expr -> NUMBER .)
-    DIVIDE          reduce using rule 64 (expr -> NUMBER .)
-    RELOP           reduce using rule 64 (expr -> NUMBER .)
-    LOGOP           reduce using rule 64 (expr -> NUMBER .)
-    AND             reduce using rule 64 (expr -> NUMBER .)
-    OR              reduce using rule 64 (expr -> NUMBER .)
-    SEMI            reduce using rule 64 (expr -> NUMBER .)
-    RPAREN          reduce using rule 64 (expr -> NUMBER .)
-    RBRACKET        reduce using rule 64 (expr -> NUMBER .)
-    COMA            reduce using rule 64 (expr -> NUMBER .)
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
+    MINUS           shift and go to state 30
+    LPAREN          shift and go to state 22
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
+    expr                           shift and go to state 66
 
 state 33
 
-    (65) expr -> STRLIT .
+    (66) expr -> NUMBER .
 
-    PLUS            reduce using rule 65 (expr -> STRLIT .)
-    MINUS           reduce using rule 65 (expr -> STRLIT .)
-    TIMES           reduce using rule 65 (expr -> STRLIT .)
-    DIVIDE          reduce using rule 65 (expr -> STRLIT .)
-    RELOP           reduce using rule 65 (expr -> STRLIT .)
-    LOGOP           reduce using rule 65 (expr -> STRLIT .)
-    AND             reduce using rule 65 (expr -> STRLIT .)
-    OR              reduce using rule 65 (expr -> STRLIT .)
-    SEMI            reduce using rule 65 (expr -> STRLIT .)
-    RPAREN          reduce using rule 65 (expr -> STRLIT .)
-    RBRACKET        reduce using rule 65 (expr -> STRLIT .)
-    COMA            reduce using rule 65 (expr -> STRLIT .)
+    PLUS            reduce using rule 66 (expr -> NUMBER .)
+    MINUS           reduce using rule 66 (expr -> NUMBER .)
+    TIMES           reduce using rule 66 (expr -> NUMBER .)
+    DIVIDE          reduce using rule 66 (expr -> NUMBER .)
+    RELOP           reduce using rule 66 (expr -> NUMBER .)
+    AND_OP          reduce using rule 66 (expr -> NUMBER .)
+    OR_OP           reduce using rule 66 (expr -> NUMBER .)
+    AND             reduce using rule 66 (expr -> NUMBER .)
+    OR              reduce using rule 66 (expr -> NUMBER .)
+    SEMI            reduce using rule 66 (expr -> NUMBER .)
+    RPAREN          reduce using rule 66 (expr -> NUMBER .)
+    RBRACKET        reduce using rule 66 (expr -> NUMBER .)
+    COMA            reduce using rule 66 (expr -> NUMBER .)
 
 
 state 34
+
+    (67) expr -> STRLIT .
+
+    PLUS            reduce using rule 67 (expr -> STRLIT .)
+    MINUS           reduce using rule 67 (expr -> STRLIT .)
+    TIMES           reduce using rule 67 (expr -> STRLIT .)
+    DIVIDE          reduce using rule 67 (expr -> STRLIT .)
+    RELOP           reduce using rule 67 (expr -> STRLIT .)
+    AND_OP          reduce using rule 67 (expr -> STRLIT .)
+    OR_OP           reduce using rule 67 (expr -> STRLIT .)
+    AND             reduce using rule 67 (expr -> STRLIT .)
+    OR              reduce using rule 67 (expr -> STRLIT .)
+    SEMI            reduce using rule 67 (expr -> STRLIT .)
+    RPAREN          reduce using rule 67 (expr -> STRLIT .)
+    RBRACKET        reduce using rule 67 (expr -> STRLIT .)
+    COMA            reduce using rule 67 (expr -> STRLIT .)
+
+
+state 35
 
     (2) statement_list -> statement_list statement .
 
@@ -829,6 +895,7 @@ state 34
     INT             reduce using rule 2 (statement_list -> statement_list statement .)
     FLOAT           reduce using rule 2 (statement_list -> statement_list statement .)
     STRING_TYPE     reduce using rule 2 (statement_list -> statement_list statement .)
+    BANG            reduce using rule 2 (statement_list -> statement_list statement .)
     NOT             reduce using rule 2 (statement_list -> statement_list statement .)
     MINUS           reduce using rule 2 (statement_list -> statement_list statement .)
     LPAREN          reduce using rule 2 (statement_list -> statement_list statement .)
@@ -838,7 +905,7 @@ state 34
     RBRACE          reduce using rule 2 (statement_list -> statement_list statement .)
 
 
-state 35
+state 36
 
     (4) statement -> decl_stmt SEMI .
 
@@ -854,6 +921,7 @@ state 35
     INT             reduce using rule 4 (statement -> decl_stmt SEMI .)
     FLOAT           reduce using rule 4 (statement -> decl_stmt SEMI .)
     STRING_TYPE     reduce using rule 4 (statement -> decl_stmt SEMI .)
+    BANG            reduce using rule 4 (statement -> decl_stmt SEMI .)
     NOT             reduce using rule 4 (statement -> decl_stmt SEMI .)
     MINUS           reduce using rule 4 (statement -> decl_stmt SEMI .)
     LPAREN          reduce using rule 4 (statement -> decl_stmt SEMI .)
@@ -863,7 +931,7 @@ state 35
     RBRACE          reduce using rule 4 (statement -> decl_stmt SEMI .)
 
 
-state 36
+state 37
 
     (5) statement -> assign_stmt SEMI .
 
@@ -879,6 +947,7 @@ state 36
     INT             reduce using rule 5 (statement -> assign_stmt SEMI .)
     FLOAT           reduce using rule 5 (statement -> assign_stmt SEMI .)
     STRING_TYPE     reduce using rule 5 (statement -> assign_stmt SEMI .)
+    BANG            reduce using rule 5 (statement -> assign_stmt SEMI .)
     NOT             reduce using rule 5 (statement -> assign_stmt SEMI .)
     MINUS           reduce using rule 5 (statement -> assign_stmt SEMI .)
     LPAREN          reduce using rule 5 (statement -> assign_stmt SEMI .)
@@ -888,7 +957,7 @@ state 36
     RBRACE          reduce using rule 5 (statement -> assign_stmt SEMI .)
 
 
-state 37
+state 38
 
     (6) statement -> return_stmt SEMI .
 
@@ -904,6 +973,7 @@ state 37
     INT             reduce using rule 6 (statement -> return_stmt SEMI .)
     FLOAT           reduce using rule 6 (statement -> return_stmt SEMI .)
     STRING_TYPE     reduce using rule 6 (statement -> return_stmt SEMI .)
+    BANG            reduce using rule 6 (statement -> return_stmt SEMI .)
     NOT             reduce using rule 6 (statement -> return_stmt SEMI .)
     MINUS           reduce using rule 6 (statement -> return_stmt SEMI .)
     LPAREN          reduce using rule 6 (statement -> return_stmt SEMI .)
@@ -913,7 +983,7 @@ state 37
     RBRACE          reduce using rule 6 (statement -> return_stmt SEMI .)
 
 
-state 38
+state 39
 
     (7) statement -> break_stmt SEMI .
 
@@ -929,6 +999,7 @@ state 38
     INT             reduce using rule 7 (statement -> break_stmt SEMI .)
     FLOAT           reduce using rule 7 (statement -> break_stmt SEMI .)
     STRING_TYPE     reduce using rule 7 (statement -> break_stmt SEMI .)
+    BANG            reduce using rule 7 (statement -> break_stmt SEMI .)
     NOT             reduce using rule 7 (statement -> break_stmt SEMI .)
     MINUS           reduce using rule 7 (statement -> break_stmt SEMI .)
     LPAREN          reduce using rule 7 (statement -> break_stmt SEMI .)
@@ -938,7 +1009,7 @@ state 38
     RBRACE          reduce using rule 7 (statement -> break_stmt SEMI .)
 
 
-state 39
+state 40
 
     (8) statement -> continue_stmt SEMI .
 
@@ -954,6 +1025,7 @@ state 39
     INT             reduce using rule 8 (statement -> continue_stmt SEMI .)
     FLOAT           reduce using rule 8 (statement -> continue_stmt SEMI .)
     STRING_TYPE     reduce using rule 8 (statement -> continue_stmt SEMI .)
+    BANG            reduce using rule 8 (statement -> continue_stmt SEMI .)
     NOT             reduce using rule 8 (statement -> continue_stmt SEMI .)
     MINUS           reduce using rule 8 (statement -> continue_stmt SEMI .)
     LPAREN          reduce using rule 8 (statement -> continue_stmt SEMI .)
@@ -963,7 +1035,7 @@ state 39
     RBRACE          reduce using rule 8 (statement -> continue_stmt SEMI .)
 
 
-state 40
+state 41
 
     (9) statement -> expr_stmt SEMI .
 
@@ -979,6 +1051,7 @@ state 40
     INT             reduce using rule 9 (statement -> expr_stmt SEMI .)
     FLOAT           reduce using rule 9 (statement -> expr_stmt SEMI .)
     STRING_TYPE     reduce using rule 9 (statement -> expr_stmt SEMI .)
+    BANG            reduce using rule 9 (statement -> expr_stmt SEMI .)
     NOT             reduce using rule 9 (statement -> expr_stmt SEMI .)
     MINUS           reduce using rule 9 (statement -> expr_stmt SEMI .)
     LPAREN          reduce using rule 9 (statement -> expr_stmt SEMI .)
@@ -988,7 +1061,7 @@ state 40
     RBRACE          reduce using rule 9 (statement -> expr_stmt SEMI .)
 
 
-state 41
+state 42
 
     (15) decl_stmt -> type_spec ID .
     (16) decl_stmt -> type_spec ID . ASSIGN expr
@@ -996,12 +1069,12 @@ state 41
     (37) func_def -> type_spec ID . LPAREN param_list RPAREN block
 
     SEMI            reduce using rule 15 (decl_stmt -> type_spec ID .)
-    ASSIGN          shift and go to state 64
-    LBRACKET        shift and go to state 65
-    LPAREN          shift and go to state 66
+    ASSIGN          shift and go to state 67
+    LBRACKET        shift and go to state 68
+    LPAREN          shift and go to state 69
 
 
-state 42
+state 43
 
     (18) assign_stmt -> ID ASSIGN . expr
     (52) expr -> . expr PLUS expr
@@ -1009,106 +1082,115 @@ state 42
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 67
-
-state 43
-
-    (19) assign_stmt -> ID DOT . ID ASSIGN expr
-    (67) expr -> ID DOT . ID
-
-    ID              shift and go to state 68
-
+    expr                           shift and go to state 70
 
 state 44
 
-    (20) assign_stmt -> ID LBRACKET . expr RBRACKET ASSIGN expr
-    (63) expr -> ID LBRACKET . expr RBRACKET
-    (52) expr -> . expr PLUS expr
-    (53) expr -> . expr MINUS expr
-    (54) expr -> . expr TIMES expr
-    (55) expr -> . expr DIVIDE expr
-    (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (19) assign_stmt -> ID DOT . ID ASSIGN expr
+    (69) expr -> ID DOT . ID
 
-    NOT             shift and go to state 31
-    MINUS           shift and go to state 30
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 71
 
-    expr                           shift and go to state 69
 
 state 45
 
-    (68) expr -> ID LPAREN . arg_list RPAREN
-    (69) arg_list -> . arg_list COMA expr
-    (70) arg_list -> . expr
-    (71) arg_list -> . empty
+    (20) assign_stmt -> ID LBRACKET . expr RBRACKET ASSIGN expr
+    (65) expr -> ID LBRACKET . expr RBRACKET
     (52) expr -> . expr PLUS expr
     (53) expr -> . expr MINUS expr
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
-    (72) empty -> .
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
-    RPAREN          reduce using rule 72 (empty -> .)
-    COMA            reduce using rule 72 (empty -> .)
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    arg_list                       shift and go to state 70
-    expr                           shift and go to state 71
-    empty                          shift and go to state 72
+    expr                           shift and go to state 72
 
 state 46
+
+    (70) expr -> ID LPAREN . arg_list RPAREN
+    (71) arg_list -> . arg_list COMA expr
+    (72) arg_list -> . expr
+    (73) arg_list -> . empty
+    (52) expr -> . expr PLUS expr
+    (53) expr -> . expr MINUS expr
+    (54) expr -> . expr TIMES expr
+    (55) expr -> . expr DIVIDE expr
+    (56) expr -> . expr RELOP expr
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
+    (74) empty -> .
+
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
+    MINUS           shift and go to state 30
+    LPAREN          shift and go to state 22
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
+    RPAREN          reduce using rule 74 (empty -> .)
+    COMA            reduce using rule 74 (empty -> .)
+
+    arg_list                       shift and go to state 73
+    expr                           shift and go to state 74
+    empty                          shift and go to state 75
+
+state 47
 
     (52) expr -> expr PLUS . expr
     (52) expr -> . expr PLUS expr
@@ -1116,29 +1198,32 @@ state 46
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 73
+    expr                           shift and go to state 76
 
-state 47
+state 48
 
     (53) expr -> expr MINUS . expr
     (52) expr -> . expr PLUS expr
@@ -1146,29 +1231,32 @@ state 47
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 74
+    expr                           shift and go to state 77
 
-state 48
+state 49
 
     (54) expr -> expr TIMES . expr
     (52) expr -> . expr PLUS expr
@@ -1176,29 +1264,32 @@ state 48
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 75
+    expr                           shift and go to state 78
 
-state 49
+state 50
 
     (55) expr -> expr DIVIDE . expr
     (52) expr -> . expr PLUS expr
@@ -1206,29 +1297,32 @@ state 49
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 76
+    expr                           shift and go to state 79
 
-state 50
+state 51
 
     (56) expr -> expr RELOP . expr
     (52) expr -> . expr PLUS expr
@@ -1236,119 +1330,164 @@ state 50
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
-
-    expr                           shift and go to state 77
-
-state 51
-
-    (57) expr -> expr LOGOP . expr
-    (52) expr -> . expr PLUS expr
-    (53) expr -> . expr MINUS expr
-    (54) expr -> . expr TIMES expr
-    (55) expr -> . expr DIVIDE expr
-    (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
-
-    NOT             shift and go to state 31
-    MINUS           shift and go to state 30
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
-
-    expr                           shift and go to state 78
-
-state 52
-
-    (58) expr -> expr AND . expr
-    (52) expr -> . expr PLUS expr
-    (53) expr -> . expr MINUS expr
-    (54) expr -> . expr TIMES expr
-    (55) expr -> . expr DIVIDE expr
-    (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
-
-    NOT             shift and go to state 31
-    MINUS           shift and go to state 30
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
-
-    expr                           shift and go to state 79
-
-state 53
-
-    (59) expr -> expr OR . expr
-    (52) expr -> . expr PLUS expr
-    (53) expr -> . expr MINUS expr
-    (54) expr -> . expr TIMES expr
-    (55) expr -> . expr DIVIDE expr
-    (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
-
-    NOT             shift and go to state 31
-    MINUS           shift and go to state 30
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
     expr                           shift and go to state 80
 
+state 52
+
+    (57) expr -> expr AND_OP . expr
+    (52) expr -> . expr PLUS expr
+    (53) expr -> . expr MINUS expr
+    (54) expr -> . expr TIMES expr
+    (55) expr -> . expr DIVIDE expr
+    (56) expr -> . expr RELOP expr
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
+
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
+    MINUS           shift and go to state 30
+    LPAREN          shift and go to state 22
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
+
+    expr                           shift and go to state 81
+
+state 53
+
+    (58) expr -> expr OR_OP . expr
+    (52) expr -> . expr PLUS expr
+    (53) expr -> . expr MINUS expr
+    (54) expr -> . expr TIMES expr
+    (55) expr -> . expr DIVIDE expr
+    (56) expr -> . expr RELOP expr
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
+
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
+    MINUS           shift and go to state 30
+    LPAREN          shift and go to state 22
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
+
+    expr                           shift and go to state 82
+
 state 54
+
+    (60) expr -> expr AND . expr
+    (52) expr -> . expr PLUS expr
+    (53) expr -> . expr MINUS expr
+    (54) expr -> . expr TIMES expr
+    (55) expr -> . expr DIVIDE expr
+    (56) expr -> . expr RELOP expr
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
+
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
+    MINUS           shift and go to state 30
+    LPAREN          shift and go to state 22
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
+
+    expr                           shift and go to state 83
+
+state 55
+
+    (61) expr -> expr OR . expr
+    (52) expr -> . expr PLUS expr
+    (53) expr -> . expr MINUS expr
+    (54) expr -> . expr TIMES expr
+    (55) expr -> . expr DIVIDE expr
+    (56) expr -> . expr RELOP expr
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
+
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
+    MINUS           shift and go to state 30
+    LPAREN          shift and go to state 22
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
+
+    expr                           shift and go to state 84
+
+state 56
 
     (22) return_stmt -> RETURN expr .
     (52) expr -> expr . PLUS expr
@@ -1356,46 +1495,49 @@ state 54
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     SEMI            reduce using rule 22 (return_stmt -> RETURN expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 55
+state 57
 
-    (63) expr -> ID . LBRACKET expr RBRACKET
-    (66) expr -> ID .
-    (67) expr -> ID . DOT ID
-    (68) expr -> ID . LPAREN arg_list RPAREN
+    (65) expr -> ID . LBRACKET expr RBRACKET
+    (68) expr -> ID .
+    (69) expr -> ID . DOT ID
+    (70) expr -> ID . LPAREN arg_list RPAREN
 
-    LBRACKET        shift and go to state 81
-    PLUS            reduce using rule 66 (expr -> ID .)
-    MINUS           reduce using rule 66 (expr -> ID .)
-    TIMES           reduce using rule 66 (expr -> ID .)
-    DIVIDE          reduce using rule 66 (expr -> ID .)
-    RELOP           reduce using rule 66 (expr -> ID .)
-    LOGOP           reduce using rule 66 (expr -> ID .)
-    AND             reduce using rule 66 (expr -> ID .)
-    OR              reduce using rule 66 (expr -> ID .)
-    SEMI            reduce using rule 66 (expr -> ID .)
-    RPAREN          reduce using rule 66 (expr -> ID .)
-    RBRACKET        reduce using rule 66 (expr -> ID .)
-    COMA            reduce using rule 66 (expr -> ID .)
-    DOT             shift and go to state 82
-    LPAREN          shift and go to state 45
+    LBRACKET        shift and go to state 85
+    PLUS            reduce using rule 68 (expr -> ID .)
+    MINUS           reduce using rule 68 (expr -> ID .)
+    TIMES           reduce using rule 68 (expr -> ID .)
+    DIVIDE          reduce using rule 68 (expr -> ID .)
+    RELOP           reduce using rule 68 (expr -> ID .)
+    AND_OP          reduce using rule 68 (expr -> ID .)
+    OR_OP           reduce using rule 68 (expr -> ID .)
+    AND             reduce using rule 68 (expr -> ID .)
+    OR              reduce using rule 68 (expr -> ID .)
+    SEMI            reduce using rule 68 (expr -> ID .)
+    RPAREN          reduce using rule 68 (expr -> ID .)
+    RBRACKET        reduce using rule 68 (expr -> ID .)
+    COMA            reduce using rule 68 (expr -> ID .)
+    DOT             shift and go to state 86
+    LPAREN          shift and go to state 46
 
 
-state 56
+state 58
 
     (26) if_stmt -> IF LPAREN . expr RPAREN block elif_chain else_block
     (52) expr -> . expr PLUS expr
@@ -1403,52 +1545,57 @@ state 56
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 83
+    expr                           shift and go to state 87
 
-state 57
+state 59
 
-    (62) expr -> LPAREN expr . RPAREN
+    (64) expr -> LPAREN expr . RPAREN
     (52) expr -> expr . PLUS expr
     (53) expr -> expr . MINUS expr
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RPAREN          shift and go to state 84
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    RPAREN          shift and go to state 88
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 58
+state 60
 
     (32) while_stmt -> WHILE LPAREN . expr RPAREN block
     (52) expr -> . expr PLUS expr
@@ -1456,29 +1603,32 @@ state 58
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 85
+    expr                           shift and go to state 89
 
-state 59
+state 61
 
     (33) for_stmt -> FOR LPAREN . for_init SEMI expr SEMI assign_stmt RPAREN block
     (34) for_init -> . decl_stmt
@@ -1494,102 +1644,146 @@ state 59
     (44) type_spec -> . STRING_TYPE
     (45) type_spec -> . ID
 
-    ID              shift and go to state 90
+    ID              shift and go to state 94
     INT             shift and go to state 27
     FLOAT           shift and go to state 28
     STRING_TYPE     shift and go to state 29
 
-    for_init                       shift and go to state 86
-    assign_stmt                    shift and go to state 87
-    decl_stmt                      shift and go to state 88
-    type_spec                      shift and go to state 89
-
-state 60
-
-    (36) func_def -> VOID ID . LPAREN param_list RPAREN block
-
-    LPAREN          shift and go to state 91
-
-
-state 61
-
-    (46) struct_def -> STRUCT ID . LBRACE struct_body RBRACE SEMI
-    (47) struct_def -> STRUCT ID . LBRACE struct_body RBRACE
-
-    LBRACE          shift and go to state 92
-
+    for_init                       shift and go to state 90
+    assign_stmt                    shift and go to state 91
+    decl_stmt                      shift and go to state 92
+    type_spec                      shift and go to state 93
 
 state 62
 
-    (61) expr -> MINUS expr .
-    (52) expr -> expr . PLUS expr
-    (53) expr -> expr . MINUS expr
-    (54) expr -> expr . TIMES expr
-    (55) expr -> expr . DIVIDE expr
-    (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (36) func_def -> VOID ID . LPAREN param_list RPAREN block
 
-    PLUS            reduce using rule 61 (expr -> MINUS expr .)
-    MINUS           reduce using rule 61 (expr -> MINUS expr .)
-    TIMES           reduce using rule 61 (expr -> MINUS expr .)
-    DIVIDE          reduce using rule 61 (expr -> MINUS expr .)
-    RELOP           reduce using rule 61 (expr -> MINUS expr .)
-    LOGOP           reduce using rule 61 (expr -> MINUS expr .)
-    AND             reduce using rule 61 (expr -> MINUS expr .)
-    OR              reduce using rule 61 (expr -> MINUS expr .)
-    SEMI            reduce using rule 61 (expr -> MINUS expr .)
-    RPAREN          reduce using rule 61 (expr -> MINUS expr .)
-    RBRACKET        reduce using rule 61 (expr -> MINUS expr .)
-    COMA            reduce using rule 61 (expr -> MINUS expr .)
-
-  ! PLUS            [ shift and go to state 46 ]
-  ! MINUS           [ shift and go to state 47 ]
-  ! TIMES           [ shift and go to state 48 ]
-  ! DIVIDE          [ shift and go to state 49 ]
-  ! RELOP           [ shift and go to state 50 ]
-  ! LOGOP           [ shift and go to state 51 ]
-  ! AND             [ shift and go to state 52 ]
-  ! OR              [ shift and go to state 53 ]
+    LPAREN          shift and go to state 95
 
 
 state 63
 
-    (60) expr -> NOT expr .
+    (46) struct_def -> STRUCT ID . LBRACE struct_body RBRACE SEMI
+    (47) struct_def -> STRUCT ID . LBRACE struct_body RBRACE
+
+    LBRACE          shift and go to state 96
+
+
+state 64
+
+    (63) expr -> MINUS expr .
     (52) expr -> expr . PLUS expr
     (53) expr -> expr . MINUS expr
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    AND             reduce using rule 60 (expr -> NOT expr .)
-    OR              reduce using rule 60 (expr -> NOT expr .)
-    SEMI            reduce using rule 60 (expr -> NOT expr .)
-    RPAREN          reduce using rule 60 (expr -> NOT expr .)
-    RBRACKET        reduce using rule 60 (expr -> NOT expr .)
-    COMA            reduce using rule 60 (expr -> NOT expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
+    PLUS            reduce using rule 63 (expr -> MINUS expr .)
+    MINUS           reduce using rule 63 (expr -> MINUS expr .)
+    TIMES           reduce using rule 63 (expr -> MINUS expr .)
+    DIVIDE          reduce using rule 63 (expr -> MINUS expr .)
+    RELOP           reduce using rule 63 (expr -> MINUS expr .)
+    AND_OP          reduce using rule 63 (expr -> MINUS expr .)
+    OR_OP           reduce using rule 63 (expr -> MINUS expr .)
+    AND             reduce using rule 63 (expr -> MINUS expr .)
+    OR              reduce using rule 63 (expr -> MINUS expr .)
+    SEMI            reduce using rule 63 (expr -> MINUS expr .)
+    RPAREN          reduce using rule 63 (expr -> MINUS expr .)
+    RBRACKET        reduce using rule 63 (expr -> MINUS expr .)
+    COMA            reduce using rule 63 (expr -> MINUS expr .)
 
-  ! PLUS            [ reduce using rule 60 (expr -> NOT expr .) ]
-  ! MINUS           [ reduce using rule 60 (expr -> NOT expr .) ]
-  ! TIMES           [ reduce using rule 60 (expr -> NOT expr .) ]
-  ! DIVIDE          [ reduce using rule 60 (expr -> NOT expr .) ]
-  ! RELOP           [ reduce using rule 60 (expr -> NOT expr .) ]
-  ! LOGOP           [ reduce using rule 60 (expr -> NOT expr .) ]
-  ! AND             [ shift and go to state 52 ]
-  ! OR              [ shift and go to state 53 ]
+  ! PLUS            [ shift and go to state 47 ]
+  ! MINUS           [ shift and go to state 48 ]
+  ! TIMES           [ shift and go to state 49 ]
+  ! DIVIDE          [ shift and go to state 50 ]
+  ! RELOP           [ shift and go to state 51 ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
 
 
-state 64
+state 65
+
+    (59) expr -> BANG expr .
+    (52) expr -> expr . PLUS expr
+    (53) expr -> expr . MINUS expr
+    (54) expr -> expr . TIMES expr
+    (55) expr -> expr . DIVIDE expr
+    (56) expr -> expr . RELOP expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
+
+    AND_OP          reduce using rule 59 (expr -> BANG expr .)
+    OR_OP           reduce using rule 59 (expr -> BANG expr .)
+    AND             reduce using rule 59 (expr -> BANG expr .)
+    OR              reduce using rule 59 (expr -> BANG expr .)
+    SEMI            reduce using rule 59 (expr -> BANG expr .)
+    RPAREN          reduce using rule 59 (expr -> BANG expr .)
+    RBRACKET        reduce using rule 59 (expr -> BANG expr .)
+    COMA            reduce using rule 59 (expr -> BANG expr .)
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+
+  ! PLUS            [ reduce using rule 59 (expr -> BANG expr .) ]
+  ! MINUS           [ reduce using rule 59 (expr -> BANG expr .) ]
+  ! TIMES           [ reduce using rule 59 (expr -> BANG expr .) ]
+  ! DIVIDE          [ reduce using rule 59 (expr -> BANG expr .) ]
+  ! RELOP           [ reduce using rule 59 (expr -> BANG expr .) ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
+
+
+state 66
+
+    (62) expr -> NOT expr .
+    (52) expr -> expr . PLUS expr
+    (53) expr -> expr . MINUS expr
+    (54) expr -> expr . TIMES expr
+    (55) expr -> expr . DIVIDE expr
+    (56) expr -> expr . RELOP expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
+
+    AND_OP          reduce using rule 62 (expr -> NOT expr .)
+    OR_OP           reduce using rule 62 (expr -> NOT expr .)
+    AND             reduce using rule 62 (expr -> NOT expr .)
+    OR              reduce using rule 62 (expr -> NOT expr .)
+    SEMI            reduce using rule 62 (expr -> NOT expr .)
+    RPAREN          reduce using rule 62 (expr -> NOT expr .)
+    RBRACKET        reduce using rule 62 (expr -> NOT expr .)
+    COMA            reduce using rule 62 (expr -> NOT expr .)
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+
+  ! PLUS            [ reduce using rule 62 (expr -> NOT expr .) ]
+  ! MINUS           [ reduce using rule 62 (expr -> NOT expr .) ]
+  ! TIMES           [ reduce using rule 62 (expr -> NOT expr .) ]
+  ! DIVIDE          [ reduce using rule 62 (expr -> NOT expr .) ]
+  ! RELOP           [ reduce using rule 62 (expr -> NOT expr .) ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
+
+
+state 67
 
     (16) decl_stmt -> type_spec ID ASSIGN . expr
     (52) expr -> . expr PLUS expr
@@ -1597,29 +1791,32 @@ state 64
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 93
+    expr                           shift and go to state 97
 
-state 65
+state 68
 
     (17) decl_stmt -> type_spec ID LBRACKET . expr RBRACKET
     (52) expr -> . expr PLUS expr
@@ -1627,54 +1824,57 @@ state 65
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 94
+    expr                           shift and go to state 98
 
-state 66
+state 69
 
     (37) func_def -> type_spec ID LPAREN . param_list RPAREN block
     (38) param_list -> . param_list COMA param
     (39) param_list -> . param
     (40) param_list -> . empty
     (41) param -> . type_spec ID
-    (72) empty -> .
+    (74) empty -> .
     (42) type_spec -> . INT
     (43) type_spec -> . FLOAT
     (44) type_spec -> . STRING_TYPE
     (45) type_spec -> . ID
 
-    RPAREN          reduce using rule 72 (empty -> .)
-    COMA            reduce using rule 72 (empty -> .)
+    RPAREN          reduce using rule 74 (empty -> .)
+    COMA            reduce using rule 74 (empty -> .)
     INT             shift and go to state 27
     FLOAT           shift and go to state 28
     STRING_TYPE     shift and go to state 29
-    ID              shift and go to state 96
+    ID              shift and go to state 100
 
-    type_spec                      shift and go to state 95
-    param_list                     shift and go to state 97
-    param                          shift and go to state 98
-    empty                          shift and go to state 99
+    type_spec                      shift and go to state 99
+    param_list                     shift and go to state 101
+    param                          shift and go to state 102
+    empty                          shift and go to state 103
 
-state 67
+state 70
 
     (18) assign_stmt -> ID ASSIGN expr .
     (52) expr -> expr . PLUS expr
@@ -1682,105 +1882,112 @@ state 67
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     SEMI            reduce using rule 18 (assign_stmt -> ID ASSIGN expr .)
     RPAREN          reduce using rule 18 (assign_stmt -> ID ASSIGN expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
-
-
-state 68
-
-    (19) assign_stmt -> ID DOT ID . ASSIGN expr
-    (67) expr -> ID DOT ID .
-
-    ASSIGN          shift and go to state 100
-    PLUS            reduce using rule 67 (expr -> ID DOT ID .)
-    MINUS           reduce using rule 67 (expr -> ID DOT ID .)
-    TIMES           reduce using rule 67 (expr -> ID DOT ID .)
-    DIVIDE          reduce using rule 67 (expr -> ID DOT ID .)
-    RELOP           reduce using rule 67 (expr -> ID DOT ID .)
-    LOGOP           reduce using rule 67 (expr -> ID DOT ID .)
-    AND             reduce using rule 67 (expr -> ID DOT ID .)
-    OR              reduce using rule 67 (expr -> ID DOT ID .)
-    SEMI            reduce using rule 67 (expr -> ID DOT ID .)
-
-
-state 69
-
-    (20) assign_stmt -> ID LBRACKET expr . RBRACKET ASSIGN expr
-    (63) expr -> ID LBRACKET expr . RBRACKET
-    (52) expr -> expr . PLUS expr
-    (53) expr -> expr . MINUS expr
-    (54) expr -> expr . TIMES expr
-    (55) expr -> expr . DIVIDE expr
-    (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
-
-    RBRACKET        shift and go to state 101
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
-
-
-state 70
-
-    (68) expr -> ID LPAREN arg_list . RPAREN
-    (69) arg_list -> arg_list . COMA expr
-
-    RPAREN          shift and go to state 102
-    COMA            shift and go to state 103
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
 state 71
 
-    (70) arg_list -> expr .
+    (19) assign_stmt -> ID DOT ID . ASSIGN expr
+    (69) expr -> ID DOT ID .
+
+    ASSIGN          shift and go to state 104
+    PLUS            reduce using rule 69 (expr -> ID DOT ID .)
+    MINUS           reduce using rule 69 (expr -> ID DOT ID .)
+    TIMES           reduce using rule 69 (expr -> ID DOT ID .)
+    DIVIDE          reduce using rule 69 (expr -> ID DOT ID .)
+    RELOP           reduce using rule 69 (expr -> ID DOT ID .)
+    AND_OP          reduce using rule 69 (expr -> ID DOT ID .)
+    OR_OP           reduce using rule 69 (expr -> ID DOT ID .)
+    AND             reduce using rule 69 (expr -> ID DOT ID .)
+    OR              reduce using rule 69 (expr -> ID DOT ID .)
+    SEMI            reduce using rule 69 (expr -> ID DOT ID .)
+
+
+state 72
+
+    (20) assign_stmt -> ID LBRACKET expr . RBRACKET ASSIGN expr
+    (65) expr -> ID LBRACKET expr . RBRACKET
     (52) expr -> expr . PLUS expr
     (53) expr -> expr . MINUS expr
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RPAREN          reduce using rule 70 (arg_list -> expr .)
-    COMA            reduce using rule 70 (arg_list -> expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
-
-
-state 72
-
-    (71) arg_list -> empty .
-
-    RPAREN          reduce using rule 71 (arg_list -> empty .)
-    COMA            reduce using rule 71 (arg_list -> empty .)
+    RBRACKET        shift and go to state 105
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
 state 73
+
+    (70) expr -> ID LPAREN arg_list . RPAREN
+    (71) arg_list -> arg_list . COMA expr
+
+    RPAREN          shift and go to state 106
+    COMA            shift and go to state 107
+
+
+state 74
+
+    (72) arg_list -> expr .
+    (52) expr -> expr . PLUS expr
+    (53) expr -> expr . MINUS expr
+    (54) expr -> expr . TIMES expr
+    (55) expr -> expr . DIVIDE expr
+    (56) expr -> expr . RELOP expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
+
+    RPAREN          reduce using rule 72 (arg_list -> expr .)
+    COMA            reduce using rule 72 (arg_list -> expr .)
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
+
+
+state 75
+
+    (73) arg_list -> empty .
+
+    RPAREN          reduce using rule 73 (arg_list -> empty .)
+    COMA            reduce using rule 73 (arg_list -> empty .)
+
+
+state 76
 
     (52) expr -> expr PLUS expr .
     (52) expr -> expr . PLUS expr
@@ -1788,34 +1995,37 @@ state 73
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     PLUS            reduce using rule 52 (expr -> expr PLUS expr .)
     MINUS           reduce using rule 52 (expr -> expr PLUS expr .)
     RELOP           reduce using rule 52 (expr -> expr PLUS expr .)
-    LOGOP           reduce using rule 52 (expr -> expr PLUS expr .)
+    AND_OP          reduce using rule 52 (expr -> expr PLUS expr .)
+    OR_OP           reduce using rule 52 (expr -> expr PLUS expr .)
     AND             reduce using rule 52 (expr -> expr PLUS expr .)
     OR              reduce using rule 52 (expr -> expr PLUS expr .)
     SEMI            reduce using rule 52 (expr -> expr PLUS expr .)
     RPAREN          reduce using rule 52 (expr -> expr PLUS expr .)
     RBRACKET        reduce using rule 52 (expr -> expr PLUS expr .)
     COMA            reduce using rule 52 (expr -> expr PLUS expr .)
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
 
   ! TIMES           [ reduce using rule 52 (expr -> expr PLUS expr .) ]
   ! DIVIDE          [ reduce using rule 52 (expr -> expr PLUS expr .) ]
-  ! PLUS            [ shift and go to state 46 ]
-  ! MINUS           [ shift and go to state 47 ]
-  ! RELOP           [ shift and go to state 50 ]
-  ! LOGOP           [ shift and go to state 51 ]
-  ! AND             [ shift and go to state 52 ]
-  ! OR              [ shift and go to state 53 ]
+  ! PLUS            [ shift and go to state 47 ]
+  ! MINUS           [ shift and go to state 48 ]
+  ! RELOP           [ shift and go to state 51 ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
 
 
-state 74
+state 77
 
     (53) expr -> expr MINUS expr .
     (52) expr -> expr . PLUS expr
@@ -1823,34 +2033,37 @@ state 74
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     PLUS            reduce using rule 53 (expr -> expr MINUS expr .)
     MINUS           reduce using rule 53 (expr -> expr MINUS expr .)
     RELOP           reduce using rule 53 (expr -> expr MINUS expr .)
-    LOGOP           reduce using rule 53 (expr -> expr MINUS expr .)
+    AND_OP          reduce using rule 53 (expr -> expr MINUS expr .)
+    OR_OP           reduce using rule 53 (expr -> expr MINUS expr .)
     AND             reduce using rule 53 (expr -> expr MINUS expr .)
     OR              reduce using rule 53 (expr -> expr MINUS expr .)
     SEMI            reduce using rule 53 (expr -> expr MINUS expr .)
     RPAREN          reduce using rule 53 (expr -> expr MINUS expr .)
     RBRACKET        reduce using rule 53 (expr -> expr MINUS expr .)
     COMA            reduce using rule 53 (expr -> expr MINUS expr .)
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
 
   ! TIMES           [ reduce using rule 53 (expr -> expr MINUS expr .) ]
   ! DIVIDE          [ reduce using rule 53 (expr -> expr MINUS expr .) ]
-  ! PLUS            [ shift and go to state 46 ]
-  ! MINUS           [ shift and go to state 47 ]
-  ! RELOP           [ shift and go to state 50 ]
-  ! LOGOP           [ shift and go to state 51 ]
-  ! AND             [ shift and go to state 52 ]
-  ! OR              [ shift and go to state 53 ]
+  ! PLUS            [ shift and go to state 47 ]
+  ! MINUS           [ shift and go to state 48 ]
+  ! RELOP           [ shift and go to state 51 ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
 
 
-state 75
+state 78
 
     (54) expr -> expr TIMES expr .
     (52) expr -> expr . PLUS expr
@@ -1858,16 +2071,18 @@ state 75
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     PLUS            reduce using rule 54 (expr -> expr TIMES expr .)
     MINUS           reduce using rule 54 (expr -> expr TIMES expr .)
     TIMES           reduce using rule 54 (expr -> expr TIMES expr .)
     DIVIDE          reduce using rule 54 (expr -> expr TIMES expr .)
     RELOP           reduce using rule 54 (expr -> expr TIMES expr .)
-    LOGOP           reduce using rule 54 (expr -> expr TIMES expr .)
+    AND_OP          reduce using rule 54 (expr -> expr TIMES expr .)
+    OR_OP           reduce using rule 54 (expr -> expr TIMES expr .)
     AND             reduce using rule 54 (expr -> expr TIMES expr .)
     OR              reduce using rule 54 (expr -> expr TIMES expr .)
     SEMI            reduce using rule 54 (expr -> expr TIMES expr .)
@@ -1875,17 +2090,18 @@ state 75
     RBRACKET        reduce using rule 54 (expr -> expr TIMES expr .)
     COMA            reduce using rule 54 (expr -> expr TIMES expr .)
 
-  ! PLUS            [ shift and go to state 46 ]
-  ! MINUS           [ shift and go to state 47 ]
-  ! TIMES           [ shift and go to state 48 ]
-  ! DIVIDE          [ shift and go to state 49 ]
-  ! RELOP           [ shift and go to state 50 ]
-  ! LOGOP           [ shift and go to state 51 ]
-  ! AND             [ shift and go to state 52 ]
-  ! OR              [ shift and go to state 53 ]
+  ! PLUS            [ shift and go to state 47 ]
+  ! MINUS           [ shift and go to state 48 ]
+  ! TIMES           [ shift and go to state 49 ]
+  ! DIVIDE          [ shift and go to state 50 ]
+  ! RELOP           [ shift and go to state 51 ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
 
 
-state 76
+state 79
 
     (55) expr -> expr DIVIDE expr .
     (52) expr -> expr . PLUS expr
@@ -1893,16 +2109,18 @@ state 76
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     PLUS            reduce using rule 55 (expr -> expr DIVIDE expr .)
     MINUS           reduce using rule 55 (expr -> expr DIVIDE expr .)
     TIMES           reduce using rule 55 (expr -> expr DIVIDE expr .)
     DIVIDE          reduce using rule 55 (expr -> expr DIVIDE expr .)
     RELOP           reduce using rule 55 (expr -> expr DIVIDE expr .)
-    LOGOP           reduce using rule 55 (expr -> expr DIVIDE expr .)
+    AND_OP          reduce using rule 55 (expr -> expr DIVIDE expr .)
+    OR_OP           reduce using rule 55 (expr -> expr DIVIDE expr .)
     AND             reduce using rule 55 (expr -> expr DIVIDE expr .)
     OR              reduce using rule 55 (expr -> expr DIVIDE expr .)
     SEMI            reduce using rule 55 (expr -> expr DIVIDE expr .)
@@ -1910,17 +2128,18 @@ state 76
     RBRACKET        reduce using rule 55 (expr -> expr DIVIDE expr .)
     COMA            reduce using rule 55 (expr -> expr DIVIDE expr .)
 
-  ! PLUS            [ shift and go to state 46 ]
-  ! MINUS           [ shift and go to state 47 ]
-  ! TIMES           [ shift and go to state 48 ]
-  ! DIVIDE          [ shift and go to state 49 ]
-  ! RELOP           [ shift and go to state 50 ]
-  ! LOGOP           [ shift and go to state 51 ]
-  ! AND             [ shift and go to state 52 ]
-  ! OR              [ shift and go to state 53 ]
+  ! PLUS            [ shift and go to state 47 ]
+  ! MINUS           [ shift and go to state 48 ]
+  ! TIMES           [ shift and go to state 49 ]
+  ! DIVIDE          [ shift and go to state 50 ]
+  ! RELOP           [ shift and go to state 51 ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
 
 
-state 77
+state 80
 
     (56) expr -> expr RELOP expr .
     (52) expr -> expr . PLUS expr
@@ -1928,176 +2147,229 @@ state 77
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     RELOP           reduce using rule 56 (expr -> expr RELOP expr .)
-    LOGOP           reduce using rule 56 (expr -> expr RELOP expr .)
+    AND_OP          reduce using rule 56 (expr -> expr RELOP expr .)
+    OR_OP           reduce using rule 56 (expr -> expr RELOP expr .)
     AND             reduce using rule 56 (expr -> expr RELOP expr .)
     OR              reduce using rule 56 (expr -> expr RELOP expr .)
     SEMI            reduce using rule 56 (expr -> expr RELOP expr .)
     RPAREN          reduce using rule 56 (expr -> expr RELOP expr .)
     RBRACKET        reduce using rule 56 (expr -> expr RELOP expr .)
     COMA            reduce using rule 56 (expr -> expr RELOP expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
 
   ! PLUS            [ reduce using rule 56 (expr -> expr RELOP expr .) ]
   ! MINUS           [ reduce using rule 56 (expr -> expr RELOP expr .) ]
   ! TIMES           [ reduce using rule 56 (expr -> expr RELOP expr .) ]
   ! DIVIDE          [ reduce using rule 56 (expr -> expr RELOP expr .) ]
-  ! RELOP           [ shift and go to state 50 ]
-  ! LOGOP           [ shift and go to state 51 ]
-  ! AND             [ shift and go to state 52 ]
-  ! OR              [ shift and go to state 53 ]
-
-
-state 78
-
-    (57) expr -> expr LOGOP expr .
-    (52) expr -> expr . PLUS expr
-    (53) expr -> expr . MINUS expr
-    (54) expr -> expr . TIMES expr
-    (55) expr -> expr . DIVIDE expr
-    (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
-
-    LOGOP           reduce using rule 57 (expr -> expr LOGOP expr .)
-    AND             reduce using rule 57 (expr -> expr LOGOP expr .)
-    OR              reduce using rule 57 (expr -> expr LOGOP expr .)
-    SEMI            reduce using rule 57 (expr -> expr LOGOP expr .)
-    RPAREN          reduce using rule 57 (expr -> expr LOGOP expr .)
-    RBRACKET        reduce using rule 57 (expr -> expr LOGOP expr .)
-    COMA            reduce using rule 57 (expr -> expr LOGOP expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-
-  ! PLUS            [ reduce using rule 57 (expr -> expr LOGOP expr .) ]
-  ! MINUS           [ reduce using rule 57 (expr -> expr LOGOP expr .) ]
-  ! TIMES           [ reduce using rule 57 (expr -> expr LOGOP expr .) ]
-  ! DIVIDE          [ reduce using rule 57 (expr -> expr LOGOP expr .) ]
-  ! RELOP           [ reduce using rule 57 (expr -> expr LOGOP expr .) ]
-  ! LOGOP           [ shift and go to state 51 ]
-  ! AND             [ shift and go to state 52 ]
-  ! OR              [ shift and go to state 53 ]
-
-
-state 79
-
-    (58) expr -> expr AND expr .
-    (52) expr -> expr . PLUS expr
-    (53) expr -> expr . MINUS expr
-    (54) expr -> expr . TIMES expr
-    (55) expr -> expr . DIVIDE expr
-    (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
-
-    AND             reduce using rule 58 (expr -> expr AND expr .)
-    OR              reduce using rule 58 (expr -> expr AND expr .)
-    SEMI            reduce using rule 58 (expr -> expr AND expr .)
-    RPAREN          reduce using rule 58 (expr -> expr AND expr .)
-    RBRACKET        reduce using rule 58 (expr -> expr AND expr .)
-    COMA            reduce using rule 58 (expr -> expr AND expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-
-  ! PLUS            [ reduce using rule 58 (expr -> expr AND expr .) ]
-  ! MINUS           [ reduce using rule 58 (expr -> expr AND expr .) ]
-  ! TIMES           [ reduce using rule 58 (expr -> expr AND expr .) ]
-  ! DIVIDE          [ reduce using rule 58 (expr -> expr AND expr .) ]
-  ! RELOP           [ reduce using rule 58 (expr -> expr AND expr .) ]
-  ! LOGOP           [ reduce using rule 58 (expr -> expr AND expr .) ]
-  ! AND             [ shift and go to state 52 ]
-  ! OR              [ shift and go to state 53 ]
-
-
-state 80
-
-    (59) expr -> expr OR expr .
-    (52) expr -> expr . PLUS expr
-    (53) expr -> expr . MINUS expr
-    (54) expr -> expr . TIMES expr
-    (55) expr -> expr . DIVIDE expr
-    (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
-
-    OR              reduce using rule 59 (expr -> expr OR expr .)
-    SEMI            reduce using rule 59 (expr -> expr OR expr .)
-    RPAREN          reduce using rule 59 (expr -> expr OR expr .)
-    RBRACKET        reduce using rule 59 (expr -> expr OR expr .)
-    COMA            reduce using rule 59 (expr -> expr OR expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-
-  ! PLUS            [ reduce using rule 59 (expr -> expr OR expr .) ]
-  ! MINUS           [ reduce using rule 59 (expr -> expr OR expr .) ]
-  ! TIMES           [ reduce using rule 59 (expr -> expr OR expr .) ]
-  ! DIVIDE          [ reduce using rule 59 (expr -> expr OR expr .) ]
-  ! RELOP           [ reduce using rule 59 (expr -> expr OR expr .) ]
-  ! LOGOP           [ reduce using rule 59 (expr -> expr OR expr .) ]
-  ! AND             [ reduce using rule 59 (expr -> expr OR expr .) ]
-  ! OR              [ shift and go to state 53 ]
+  ! RELOP           [ shift and go to state 51 ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
 
 
 state 81
 
-    (63) expr -> ID LBRACKET . expr RBRACKET
+    (57) expr -> expr AND_OP expr .
+    (52) expr -> expr . PLUS expr
+    (53) expr -> expr . MINUS expr
+    (54) expr -> expr . TIMES expr
+    (55) expr -> expr . DIVIDE expr
+    (56) expr -> expr . RELOP expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
+
+    AND_OP          reduce using rule 57 (expr -> expr AND_OP expr .)
+    OR_OP           reduce using rule 57 (expr -> expr AND_OP expr .)
+    AND             reduce using rule 57 (expr -> expr AND_OP expr .)
+    OR              reduce using rule 57 (expr -> expr AND_OP expr .)
+    SEMI            reduce using rule 57 (expr -> expr AND_OP expr .)
+    RPAREN          reduce using rule 57 (expr -> expr AND_OP expr .)
+    RBRACKET        reduce using rule 57 (expr -> expr AND_OP expr .)
+    COMA            reduce using rule 57 (expr -> expr AND_OP expr .)
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+
+  ! PLUS            [ reduce using rule 57 (expr -> expr AND_OP expr .) ]
+  ! MINUS           [ reduce using rule 57 (expr -> expr AND_OP expr .) ]
+  ! TIMES           [ reduce using rule 57 (expr -> expr AND_OP expr .) ]
+  ! DIVIDE          [ reduce using rule 57 (expr -> expr AND_OP expr .) ]
+  ! RELOP           [ reduce using rule 57 (expr -> expr AND_OP expr .) ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
+
+
+state 82
+
+    (58) expr -> expr OR_OP expr .
+    (52) expr -> expr . PLUS expr
+    (53) expr -> expr . MINUS expr
+    (54) expr -> expr . TIMES expr
+    (55) expr -> expr . DIVIDE expr
+    (56) expr -> expr . RELOP expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
+
+    OR_OP           reduce using rule 58 (expr -> expr OR_OP expr .)
+    OR              reduce using rule 58 (expr -> expr OR_OP expr .)
+    SEMI            reduce using rule 58 (expr -> expr OR_OP expr .)
+    RPAREN          reduce using rule 58 (expr -> expr OR_OP expr .)
+    RBRACKET        reduce using rule 58 (expr -> expr OR_OP expr .)
+    COMA            reduce using rule 58 (expr -> expr OR_OP expr .)
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    AND             shift and go to state 54
+
+  ! PLUS            [ reduce using rule 58 (expr -> expr OR_OP expr .) ]
+  ! MINUS           [ reduce using rule 58 (expr -> expr OR_OP expr .) ]
+  ! TIMES           [ reduce using rule 58 (expr -> expr OR_OP expr .) ]
+  ! DIVIDE          [ reduce using rule 58 (expr -> expr OR_OP expr .) ]
+  ! RELOP           [ reduce using rule 58 (expr -> expr OR_OP expr .) ]
+  ! AND_OP          [ reduce using rule 58 (expr -> expr OR_OP expr .) ]
+  ! AND             [ reduce using rule 58 (expr -> expr OR_OP expr .) ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! OR              [ shift and go to state 55 ]
+
+
+state 83
+
+    (60) expr -> expr AND expr .
+    (52) expr -> expr . PLUS expr
+    (53) expr -> expr . MINUS expr
+    (54) expr -> expr . TIMES expr
+    (55) expr -> expr . DIVIDE expr
+    (56) expr -> expr . RELOP expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
+
+    AND_OP          reduce using rule 60 (expr -> expr AND expr .)
+    OR_OP           reduce using rule 60 (expr -> expr AND expr .)
+    AND             reduce using rule 60 (expr -> expr AND expr .)
+    OR              reduce using rule 60 (expr -> expr AND expr .)
+    SEMI            reduce using rule 60 (expr -> expr AND expr .)
+    RPAREN          reduce using rule 60 (expr -> expr AND expr .)
+    RBRACKET        reduce using rule 60 (expr -> expr AND expr .)
+    COMA            reduce using rule 60 (expr -> expr AND expr .)
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+
+  ! PLUS            [ reduce using rule 60 (expr -> expr AND expr .) ]
+  ! MINUS           [ reduce using rule 60 (expr -> expr AND expr .) ]
+  ! TIMES           [ reduce using rule 60 (expr -> expr AND expr .) ]
+  ! DIVIDE          [ reduce using rule 60 (expr -> expr AND expr .) ]
+  ! RELOP           [ reduce using rule 60 (expr -> expr AND expr .) ]
+  ! AND_OP          [ shift and go to state 52 ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! AND             [ shift and go to state 54 ]
+  ! OR              [ shift and go to state 55 ]
+
+
+state 84
+
+    (61) expr -> expr OR expr .
+    (52) expr -> expr . PLUS expr
+    (53) expr -> expr . MINUS expr
+    (54) expr -> expr . TIMES expr
+    (55) expr -> expr . DIVIDE expr
+    (56) expr -> expr . RELOP expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
+
+    OR_OP           reduce using rule 61 (expr -> expr OR expr .)
+    OR              reduce using rule 61 (expr -> expr OR expr .)
+    SEMI            reduce using rule 61 (expr -> expr OR expr .)
+    RPAREN          reduce using rule 61 (expr -> expr OR expr .)
+    RBRACKET        reduce using rule 61 (expr -> expr OR expr .)
+    COMA            reduce using rule 61 (expr -> expr OR expr .)
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    AND             shift and go to state 54
+
+  ! PLUS            [ reduce using rule 61 (expr -> expr OR expr .) ]
+  ! MINUS           [ reduce using rule 61 (expr -> expr OR expr .) ]
+  ! TIMES           [ reduce using rule 61 (expr -> expr OR expr .) ]
+  ! DIVIDE          [ reduce using rule 61 (expr -> expr OR expr .) ]
+  ! RELOP           [ reduce using rule 61 (expr -> expr OR expr .) ]
+  ! AND_OP          [ reduce using rule 61 (expr -> expr OR expr .) ]
+  ! AND             [ reduce using rule 61 (expr -> expr OR expr .) ]
+  ! OR_OP           [ shift and go to state 53 ]
+  ! OR              [ shift and go to state 55 ]
+
+
+state 85
+
+    (65) expr -> ID LBRACKET . expr RBRACKET
     (52) expr -> . expr PLUS expr
     (53) expr -> . expr MINUS expr
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 104
+    expr                           shift and go to state 108
 
-state 82
+state 86
 
-    (67) expr -> ID DOT . ID
+    (69) expr -> ID DOT . ID
 
-    ID              shift and go to state 105
+    ID              shift and go to state 109
 
 
-state 83
+state 87
 
     (26) if_stmt -> IF LPAREN expr . RPAREN block elif_chain else_block
     (52) expr -> expr . PLUS expr
@@ -2105,40 +2377,43 @@ state 83
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RPAREN          shift and go to state 106
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
-
-
-state 84
-
-    (62) expr -> LPAREN expr RPAREN .
-
-    PLUS            reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    MINUS           reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    TIMES           reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    DIVIDE          reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    RELOP           reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    LOGOP           reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    AND             reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    OR              reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    SEMI            reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    RPAREN          reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    RBRACKET        reduce using rule 62 (expr -> LPAREN expr RPAREN .)
-    COMA            reduce using rule 62 (expr -> LPAREN expr RPAREN .)
+    RPAREN          shift and go to state 110
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 85
+state 88
+
+    (64) expr -> LPAREN expr RPAREN .
+
+    PLUS            reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    MINUS           reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    TIMES           reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    DIVIDE          reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    RELOP           reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    AND_OP          reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    OR_OP           reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    AND             reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    OR              reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    SEMI            reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    RPAREN          reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    RBRACKET        reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+    COMA            reduce using rule 64 (expr -> LPAREN expr RPAREN .)
+
+
+state 89
 
     (32) while_stmt -> WHILE LPAREN expr . RPAREN block
     (52) expr -> expr . PLUS expr
@@ -2146,107 +2421,109 @@ state 85
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RPAREN          shift and go to state 107
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    RPAREN          shift and go to state 111
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 86
+state 90
 
     (33) for_stmt -> FOR LPAREN for_init . SEMI expr SEMI assign_stmt RPAREN block
 
-    SEMI            shift and go to state 108
+    SEMI            shift and go to state 112
 
 
-state 87
+state 91
 
     (35) for_init -> assign_stmt .
 
     SEMI            reduce using rule 35 (for_init -> assign_stmt .)
 
 
-state 88
+state 92
 
     (34) for_init -> decl_stmt .
 
     SEMI            reduce using rule 34 (for_init -> decl_stmt .)
 
 
-state 89
+state 93
 
     (15) decl_stmt -> type_spec . ID
     (16) decl_stmt -> type_spec . ID ASSIGN expr
     (17) decl_stmt -> type_spec . ID LBRACKET expr RBRACKET
 
-    ID              shift and go to state 109
+    ID              shift and go to state 113
 
 
-state 90
+state 94
 
     (18) assign_stmt -> ID . ASSIGN expr
     (19) assign_stmt -> ID . DOT ID ASSIGN expr
     (20) assign_stmt -> ID . LBRACKET expr RBRACKET ASSIGN expr
     (45) type_spec -> ID .
 
-    ASSIGN          shift and go to state 42
-    DOT             shift and go to state 110
-    LBRACKET        shift and go to state 111
+    ASSIGN          shift and go to state 43
+    DOT             shift and go to state 114
+    LBRACKET        shift and go to state 115
     ID              reduce using rule 45 (type_spec -> ID .)
 
 
-state 91
+state 95
 
     (36) func_def -> VOID ID LPAREN . param_list RPAREN block
     (38) param_list -> . param_list COMA param
     (39) param_list -> . param
     (40) param_list -> . empty
     (41) param -> . type_spec ID
-    (72) empty -> .
+    (74) empty -> .
     (42) type_spec -> . INT
     (43) type_spec -> . FLOAT
     (44) type_spec -> . STRING_TYPE
     (45) type_spec -> . ID
 
-    RPAREN          reduce using rule 72 (empty -> .)
-    COMA            reduce using rule 72 (empty -> .)
+    RPAREN          reduce using rule 74 (empty -> .)
+    COMA            reduce using rule 74 (empty -> .)
     INT             shift and go to state 27
     FLOAT           shift and go to state 28
     STRING_TYPE     shift and go to state 29
-    ID              shift and go to state 96
+    ID              shift and go to state 100
 
-    param_list                     shift and go to state 112
-    param                          shift and go to state 98
-    empty                          shift and go to state 99
-    type_spec                      shift and go to state 95
+    param_list                     shift and go to state 116
+    param                          shift and go to state 102
+    empty                          shift and go to state 103
+    type_spec                      shift and go to state 99
 
-state 92
+state 96
 
     (46) struct_def -> STRUCT ID LBRACE . struct_body RBRACE SEMI
     (47) struct_def -> STRUCT ID LBRACE . struct_body RBRACE
     (48) struct_body -> . struct_body type_spec ID SEMI
     (49) struct_body -> . empty
-    (72) empty -> .
+    (74) empty -> .
 
-    RBRACE          reduce using rule 72 (empty -> .)
-    INT             reduce using rule 72 (empty -> .)
-    FLOAT           reduce using rule 72 (empty -> .)
-    STRING_TYPE     reduce using rule 72 (empty -> .)
-    ID              reduce using rule 72 (empty -> .)
+    RBRACE          reduce using rule 74 (empty -> .)
+    INT             reduce using rule 74 (empty -> .)
+    FLOAT           reduce using rule 74 (empty -> .)
+    STRING_TYPE     reduce using rule 74 (empty -> .)
+    ID              reduce using rule 74 (empty -> .)
 
-    struct_body                    shift and go to state 113
-    empty                          shift and go to state 114
+    struct_body                    shift and go to state 117
+    empty                          shift and go to state 118
 
-state 93
+state 97
 
     (16) decl_stmt -> type_spec ID ASSIGN expr .
     (52) expr -> expr . PLUS expr
@@ -2254,22 +2531,24 @@ state 93
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     SEMI            reduce using rule 16 (decl_stmt -> type_spec ID ASSIGN expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 94
+state 98
 
     (17) decl_stmt -> type_spec ID LBRACKET expr . RBRACKET
     (52) expr -> expr . PLUS expr
@@ -2277,45 +2556,47 @@ state 94
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RBRACKET        shift and go to state 115
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    RBRACKET        shift and go to state 119
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 95
+state 99
 
     (41) param -> type_spec . ID
 
-    ID              shift and go to state 116
+    ID              shift and go to state 120
 
 
-state 96
+state 100
 
     (45) type_spec -> ID .
 
     ID              reduce using rule 45 (type_spec -> ID .)
 
 
-state 97
+state 101
 
     (37) func_def -> type_spec ID LPAREN param_list . RPAREN block
     (38) param_list -> param_list . COMA param
 
-    RPAREN          shift and go to state 117
-    COMA            shift and go to state 118
+    RPAREN          shift and go to state 121
+    COMA            shift and go to state 122
 
 
-state 98
+state 102
 
     (39) param_list -> param .
 
@@ -2323,7 +2604,7 @@ state 98
     COMA            reduce using rule 39 (param_list -> param .)
 
 
-state 99
+state 103
 
     (40) param_list -> empty .
 
@@ -2331,7 +2612,7 @@ state 99
     COMA            reduce using rule 40 (param_list -> empty .)
 
 
-state 100
+state 104
 
     (19) assign_stmt -> ID DOT ID ASSIGN . expr
     (52) expr -> . expr PLUS expr
@@ -2339,155 +2620,166 @@ state 100
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 119
+    expr                           shift and go to state 123
 
-state 101
+state 105
 
     (20) assign_stmt -> ID LBRACKET expr RBRACKET . ASSIGN expr
-    (63) expr -> ID LBRACKET expr RBRACKET .
+    (65) expr -> ID LBRACKET expr RBRACKET .
 
-    ASSIGN          shift and go to state 120
-    PLUS            reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    MINUS           reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    TIMES           reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    DIVIDE          reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    RELOP           reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    LOGOP           reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    AND             reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    OR              reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    SEMI            reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-
-
-state 102
-
-    (68) expr -> ID LPAREN arg_list RPAREN .
-
-    PLUS            reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    MINUS           reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    TIMES           reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    DIVIDE          reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    RELOP           reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    LOGOP           reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    AND             reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    OR              reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    SEMI            reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    RPAREN          reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    RBRACKET        reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
-    COMA            reduce using rule 68 (expr -> ID LPAREN arg_list RPAREN .)
+    ASSIGN          shift and go to state 124
+    PLUS            reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    MINUS           reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    TIMES           reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    DIVIDE          reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    RELOP           reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    AND_OP          reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    OR_OP           reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    AND             reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    OR              reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    SEMI            reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
 
 
-state 103
+state 106
 
-    (69) arg_list -> arg_list COMA . expr
+    (70) expr -> ID LPAREN arg_list RPAREN .
+
+    PLUS            reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    MINUS           reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    TIMES           reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    DIVIDE          reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    RELOP           reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    AND_OP          reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    OR_OP           reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    AND             reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    OR              reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    SEMI            reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    RPAREN          reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    RBRACKET        reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+    COMA            reduce using rule 70 (expr -> ID LPAREN arg_list RPAREN .)
+
+
+state 107
+
+    (71) arg_list -> arg_list COMA . expr
     (52) expr -> . expr PLUS expr
     (53) expr -> . expr MINUS expr
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 121
+    expr                           shift and go to state 125
 
-state 104
+state 108
 
-    (63) expr -> ID LBRACKET expr . RBRACKET
+    (65) expr -> ID LBRACKET expr . RBRACKET
     (52) expr -> expr . PLUS expr
     (53) expr -> expr . MINUS expr
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RBRACKET        shift and go to state 122
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
-
-
-state 105
-
-    (67) expr -> ID DOT ID .
-
-    PLUS            reduce using rule 67 (expr -> ID DOT ID .)
-    MINUS           reduce using rule 67 (expr -> ID DOT ID .)
-    TIMES           reduce using rule 67 (expr -> ID DOT ID .)
-    DIVIDE          reduce using rule 67 (expr -> ID DOT ID .)
-    RELOP           reduce using rule 67 (expr -> ID DOT ID .)
-    LOGOP           reduce using rule 67 (expr -> ID DOT ID .)
-    AND             reduce using rule 67 (expr -> ID DOT ID .)
-    OR              reduce using rule 67 (expr -> ID DOT ID .)
-    SEMI            reduce using rule 67 (expr -> ID DOT ID .)
-    RPAREN          reduce using rule 67 (expr -> ID DOT ID .)
-    RBRACKET        reduce using rule 67 (expr -> ID DOT ID .)
-    COMA            reduce using rule 67 (expr -> ID DOT ID .)
+    RBRACKET        shift and go to state 126
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 106
+state 109
+
+    (69) expr -> ID DOT ID .
+
+    PLUS            reduce using rule 69 (expr -> ID DOT ID .)
+    MINUS           reduce using rule 69 (expr -> ID DOT ID .)
+    TIMES           reduce using rule 69 (expr -> ID DOT ID .)
+    DIVIDE          reduce using rule 69 (expr -> ID DOT ID .)
+    RELOP           reduce using rule 69 (expr -> ID DOT ID .)
+    AND_OP          reduce using rule 69 (expr -> ID DOT ID .)
+    OR_OP           reduce using rule 69 (expr -> ID DOT ID .)
+    AND             reduce using rule 69 (expr -> ID DOT ID .)
+    OR              reduce using rule 69 (expr -> ID DOT ID .)
+    SEMI            reduce using rule 69 (expr -> ID DOT ID .)
+    RPAREN          reduce using rule 69 (expr -> ID DOT ID .)
+    RBRACKET        reduce using rule 69 (expr -> ID DOT ID .)
+    COMA            reduce using rule 69 (expr -> ID DOT ID .)
+
+
+state 110
 
     (26) if_stmt -> IF LPAREN expr RPAREN . block elif_chain else_block
     (50) block -> . LBRACE statement_list RBRACE
     (51) block -> . LBRACE RBRACE
 
-    LBRACE          shift and go to state 124
+    LBRACE          shift and go to state 128
 
-    block                          shift and go to state 123
+    block                          shift and go to state 127
 
-state 107
+state 111
 
     (32) while_stmt -> WHILE LPAREN expr RPAREN . block
     (50) block -> . LBRACE statement_list RBRACE
     (51) block -> . LBRACE RBRACE
 
-    LBRACE          shift and go to state 124
+    LBRACE          shift and go to state 128
 
-    block                          shift and go to state 125
+    block                          shift and go to state 129
 
-state 108
+state 112
 
     (33) for_stmt -> FOR LPAREN for_init SEMI . expr SEMI assign_stmt RPAREN block
     (52) expr -> . expr PLUS expr
@@ -2495,47 +2787,50 @@ state 108
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 126
+    expr                           shift and go to state 130
 
-state 109
+state 113
 
     (15) decl_stmt -> type_spec ID .
     (16) decl_stmt -> type_spec ID . ASSIGN expr
     (17) decl_stmt -> type_spec ID . LBRACKET expr RBRACKET
 
     SEMI            reduce using rule 15 (decl_stmt -> type_spec ID .)
-    ASSIGN          shift and go to state 64
-    LBRACKET        shift and go to state 65
+    ASSIGN          shift and go to state 67
+    LBRACKET        shift and go to state 68
 
 
-state 110
+state 114
 
     (19) assign_stmt -> ID DOT . ID ASSIGN expr
 
-    ID              shift and go to state 127
+    ID              shift and go to state 131
 
 
-state 111
+state 115
 
     (20) assign_stmt -> ID LBRACKET . expr RBRACKET ASSIGN expr
     (52) expr -> . expr PLUS expr
@@ -2543,38 +2838,41 @@ state 111
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 128
+    expr                           shift and go to state 132
 
-state 112
+state 116
 
     (36) func_def -> VOID ID LPAREN param_list . RPAREN block
     (38) param_list -> param_list . COMA param
 
-    RPAREN          shift and go to state 129
-    COMA            shift and go to state 118
+    RPAREN          shift and go to state 133
+    COMA            shift and go to state 122
 
 
-state 113
+state 117
 
     (46) struct_def -> STRUCT ID LBRACE struct_body . RBRACE SEMI
     (47) struct_def -> STRUCT ID LBRACE struct_body . RBRACE
@@ -2584,15 +2882,15 @@ state 113
     (44) type_spec -> . STRING_TYPE
     (45) type_spec -> . ID
 
-    RBRACE          shift and go to state 130
+    RBRACE          shift and go to state 134
     INT             shift and go to state 27
     FLOAT           shift and go to state 28
     STRING_TYPE     shift and go to state 29
-    ID              shift and go to state 96
+    ID              shift and go to state 100
 
-    type_spec                      shift and go to state 131
+    type_spec                      shift and go to state 135
 
-state 114
+state 118
 
     (49) struct_body -> empty .
 
@@ -2603,14 +2901,14 @@ state 114
     ID              reduce using rule 49 (struct_body -> empty .)
 
 
-state 115
+state 119
 
     (17) decl_stmt -> type_spec ID LBRACKET expr RBRACKET .
 
     SEMI            reduce using rule 17 (decl_stmt -> type_spec ID LBRACKET expr RBRACKET .)
 
 
-state 116
+state 120
 
     (41) param -> type_spec ID .
 
@@ -2618,17 +2916,17 @@ state 116
     COMA            reduce using rule 41 (param -> type_spec ID .)
 
 
-state 117
+state 121
 
     (37) func_def -> type_spec ID LPAREN param_list RPAREN . block
     (50) block -> . LBRACE statement_list RBRACE
     (51) block -> . LBRACE RBRACE
 
-    LBRACE          shift and go to state 124
+    LBRACE          shift and go to state 128
 
-    block                          shift and go to state 132
+    block                          shift and go to state 136
 
-state 118
+state 122
 
     (38) param_list -> param_list COMA . param
     (41) param -> . type_spec ID
@@ -2640,12 +2938,12 @@ state 118
     INT             shift and go to state 27
     FLOAT           shift and go to state 28
     STRING_TYPE     shift and go to state 29
-    ID              shift and go to state 96
+    ID              shift and go to state 100
 
-    param                          shift and go to state 133
-    type_spec                      shift and go to state 95
+    param                          shift and go to state 137
+    type_spec                      shift and go to state 99
 
-state 119
+state 123
 
     (19) assign_stmt -> ID DOT ID ASSIGN expr .
     (52) expr -> expr . PLUS expr
@@ -2653,23 +2951,25 @@ state 119
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     SEMI            reduce using rule 19 (assign_stmt -> ID DOT ID ASSIGN expr .)
     RPAREN          reduce using rule 19 (assign_stmt -> ID DOT ID ASSIGN expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 120
+state 124
 
     (20) assign_stmt -> ID LBRACKET expr RBRACKET ASSIGN . expr
     (52) expr -> . expr PLUS expr
@@ -2677,104 +2977,111 @@ state 120
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 134
+    expr                           shift and go to state 138
 
-state 121
+state 125
 
-    (69) arg_list -> arg_list COMA expr .
+    (71) arg_list -> arg_list COMA expr .
     (52) expr -> expr . PLUS expr
     (53) expr -> expr . MINUS expr
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RPAREN          reduce using rule 69 (arg_list -> arg_list COMA expr .)
-    COMA            reduce using rule 69 (arg_list -> arg_list COMA expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
-
-
-state 122
-
-    (63) expr -> ID LBRACKET expr RBRACKET .
-
-    PLUS            reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    MINUS           reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    TIMES           reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    DIVIDE          reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    RELOP           reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    LOGOP           reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    AND             reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    OR              reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    SEMI            reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    RPAREN          reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    RBRACKET        reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
-    COMA            reduce using rule 63 (expr -> ID LBRACKET expr RBRACKET .)
+    RPAREN          reduce using rule 71 (arg_list -> arg_list COMA expr .)
+    COMA            reduce using rule 71 (arg_list -> arg_list COMA expr .)
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 123
+state 126
+
+    (65) expr -> ID LBRACKET expr RBRACKET .
+
+    PLUS            reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    MINUS           reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    TIMES           reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    DIVIDE          reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    RELOP           reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    AND_OP          reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    OR_OP           reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    AND             reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    OR              reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    SEMI            reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    RPAREN          reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    RBRACKET        reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+    COMA            reduce using rule 65 (expr -> ID LBRACKET expr RBRACKET .)
+
+
+state 127
 
     (26) if_stmt -> IF LPAREN expr RPAREN block . elif_chain else_block
     (27) elif_chain -> . elif_chain ELIF LPAREN expr RPAREN block
     (28) elif_chain -> . elif_chain ELSE IF LPAREN expr RPAREN block
     (29) elif_chain -> . empty
-    (72) empty -> .
+    (74) empty -> .
 
-    ELIF            reduce using rule 72 (empty -> .)
-    ELSE            reduce using rule 72 (empty -> .)
-    ID              reduce using rule 72 (empty -> .)
-    RETURN          reduce using rule 72 (empty -> .)
-    BREAK           reduce using rule 72 (empty -> .)
-    CONTINUE        reduce using rule 72 (empty -> .)
-    IF              reduce using rule 72 (empty -> .)
-    WHILE           reduce using rule 72 (empty -> .)
-    FOR             reduce using rule 72 (empty -> .)
-    VOID            reduce using rule 72 (empty -> .)
-    STRUCT          reduce using rule 72 (empty -> .)
-    INT             reduce using rule 72 (empty -> .)
-    FLOAT           reduce using rule 72 (empty -> .)
-    STRING_TYPE     reduce using rule 72 (empty -> .)
-    NOT             reduce using rule 72 (empty -> .)
-    MINUS           reduce using rule 72 (empty -> .)
-    LPAREN          reduce using rule 72 (empty -> .)
-    NUMBER          reduce using rule 72 (empty -> .)
-    STRLIT          reduce using rule 72 (empty -> .)
-    $end            reduce using rule 72 (empty -> .)
-    RBRACE          reduce using rule 72 (empty -> .)
+    ELIF            reduce using rule 74 (empty -> .)
+    ELSE            reduce using rule 74 (empty -> .)
+    ID              reduce using rule 74 (empty -> .)
+    RETURN          reduce using rule 74 (empty -> .)
+    BREAK           reduce using rule 74 (empty -> .)
+    CONTINUE        reduce using rule 74 (empty -> .)
+    IF              reduce using rule 74 (empty -> .)
+    WHILE           reduce using rule 74 (empty -> .)
+    FOR             reduce using rule 74 (empty -> .)
+    VOID            reduce using rule 74 (empty -> .)
+    STRUCT          reduce using rule 74 (empty -> .)
+    INT             reduce using rule 74 (empty -> .)
+    FLOAT           reduce using rule 74 (empty -> .)
+    STRING_TYPE     reduce using rule 74 (empty -> .)
+    BANG            reduce using rule 74 (empty -> .)
+    NOT             reduce using rule 74 (empty -> .)
+    MINUS           reduce using rule 74 (empty -> .)
+    LPAREN          reduce using rule 74 (empty -> .)
+    NUMBER          reduce using rule 74 (empty -> .)
+    STRLIT          reduce using rule 74 (empty -> .)
+    $end            reduce using rule 74 (empty -> .)
+    RBRACE          reduce using rule 74 (empty -> .)
 
-    elif_chain                     shift and go to state 135
-    empty                          shift and go to state 136
+    elif_chain                     shift and go to state 139
+    empty                          shift and go to state 140
 
-state 124
+state 128
 
     (50) block -> LBRACE . statement_list RBRACE
     (51) block -> LBRACE . RBRACE
@@ -2818,20 +3125,22 @@ state 124
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    RBRACE          shift and go to state 138
+    RBRACE          shift and go to state 142
     ID              shift and go to state 16
     RETURN          shift and go to state 18
     BREAK           shift and go to state 19
@@ -2844,13 +3153,14 @@ state 124
     INT             shift and go to state 27
     FLOAT           shift and go to state 28
     STRING_TYPE     shift and go to state 29
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    statement_list                 shift and go to state 137
+    statement_list                 shift and go to state 141
     statement                      shift and go to state 3
     decl_stmt                      shift and go to state 4
     assign_stmt                    shift and go to state 5
@@ -2866,7 +3176,7 @@ state 124
     type_spec                      shift and go to state 15
     expr                           shift and go to state 17
 
-state 125
+state 129
 
     (32) while_stmt -> WHILE LPAREN expr RPAREN block .
 
@@ -2882,6 +3192,7 @@ state 125
     INT             reduce using rule 32 (while_stmt -> WHILE LPAREN expr RPAREN block .)
     FLOAT           reduce using rule 32 (while_stmt -> WHILE LPAREN expr RPAREN block .)
     STRING_TYPE     reduce using rule 32 (while_stmt -> WHILE LPAREN expr RPAREN block .)
+    BANG            reduce using rule 32 (while_stmt -> WHILE LPAREN expr RPAREN block .)
     NOT             reduce using rule 32 (while_stmt -> WHILE LPAREN expr RPAREN block .)
     MINUS           reduce using rule 32 (while_stmt -> WHILE LPAREN expr RPAREN block .)
     LPAREN          reduce using rule 32 (while_stmt -> WHILE LPAREN expr RPAREN block .)
@@ -2891,7 +3202,7 @@ state 125
     RBRACE          reduce using rule 32 (while_stmt -> WHILE LPAREN expr RPAREN block .)
 
 
-state 126
+state 130
 
     (33) for_stmt -> FOR LPAREN for_init SEMI expr . SEMI assign_stmt RPAREN block
     (52) expr -> expr . PLUS expr
@@ -2899,29 +3210,31 @@ state 126
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    SEMI            shift and go to state 139
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    SEMI            shift and go to state 143
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 127
+state 131
 
     (19) assign_stmt -> ID DOT ID . ASSIGN expr
 
-    ASSIGN          shift and go to state 100
+    ASSIGN          shift and go to state 104
 
 
-state 128
+state 132
 
     (20) assign_stmt -> ID LBRACKET expr . RBRACKET ASSIGN expr
     (52) expr -> expr . PLUS expr
@@ -2929,37 +3242,39 @@ state 128
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RBRACKET        shift and go to state 140
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    RBRACKET        shift and go to state 144
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 129
+state 133
 
     (36) func_def -> VOID ID LPAREN param_list RPAREN . block
     (50) block -> . LBRACE statement_list RBRACE
     (51) block -> . LBRACE RBRACE
 
-    LBRACE          shift and go to state 124
+    LBRACE          shift and go to state 128
 
-    block                          shift and go to state 141
+    block                          shift and go to state 145
 
-state 130
+state 134
 
     (46) struct_def -> STRUCT ID LBRACE struct_body RBRACE . SEMI
     (47) struct_def -> STRUCT ID LBRACE struct_body RBRACE .
 
-    SEMI            shift and go to state 142
+    SEMI            shift and go to state 146
     ID              reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
     RETURN          reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
     BREAK           reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
@@ -2972,6 +3287,7 @@ state 130
     INT             reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
     FLOAT           reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
     STRING_TYPE     reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
+    BANG            reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
     NOT             reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
     MINUS           reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
     LPAREN          reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
@@ -2981,14 +3297,14 @@ state 130
     RBRACE          reduce using rule 47 (struct_def -> STRUCT ID LBRACE struct_body RBRACE .)
 
 
-state 131
+state 135
 
     (48) struct_body -> struct_body type_spec . ID SEMI
 
-    ID              shift and go to state 143
+    ID              shift and go to state 147
 
 
-state 132
+state 136
 
     (37) func_def -> type_spec ID LPAREN param_list RPAREN block .
 
@@ -3004,6 +3320,7 @@ state 132
     INT             reduce using rule 37 (func_def -> type_spec ID LPAREN param_list RPAREN block .)
     FLOAT           reduce using rule 37 (func_def -> type_spec ID LPAREN param_list RPAREN block .)
     STRING_TYPE     reduce using rule 37 (func_def -> type_spec ID LPAREN param_list RPAREN block .)
+    BANG            reduce using rule 37 (func_def -> type_spec ID LPAREN param_list RPAREN block .)
     NOT             reduce using rule 37 (func_def -> type_spec ID LPAREN param_list RPAREN block .)
     MINUS           reduce using rule 37 (func_def -> type_spec ID LPAREN param_list RPAREN block .)
     LPAREN          reduce using rule 37 (func_def -> type_spec ID LPAREN param_list RPAREN block .)
@@ -3013,7 +3330,7 @@ state 132
     RBRACE          reduce using rule 37 (func_def -> type_spec ID LPAREN param_list RPAREN block .)
 
 
-state 133
+state 137
 
     (38) param_list -> param_list COMA param .
 
@@ -3021,7 +3338,7 @@ state 133
     COMA            reduce using rule 38 (param_list -> param_list COMA param .)
 
 
-state 134
+state 138
 
     (20) assign_stmt -> ID LBRACKET expr RBRACKET ASSIGN expr .
     (52) expr -> expr . PLUS expr
@@ -3029,57 +3346,60 @@ state 134
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
     SEMI            reduce using rule 20 (assign_stmt -> ID LBRACKET expr RBRACKET ASSIGN expr .)
     RPAREN          reduce using rule 20 (assign_stmt -> ID LBRACKET expr RBRACKET ASSIGN expr .)
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 135
+state 139
 
     (26) if_stmt -> IF LPAREN expr RPAREN block elif_chain . else_block
     (27) elif_chain -> elif_chain . ELIF LPAREN expr RPAREN block
     (28) elif_chain -> elif_chain . ELSE IF LPAREN expr RPAREN block
     (30) else_block -> . ELSE block
     (31) else_block -> . empty
-    (72) empty -> .
+    (74) empty -> .
 
-    ELIF            shift and go to state 145
-    ELSE            shift and go to state 146
-    ID              reduce using rule 72 (empty -> .)
-    RETURN          reduce using rule 72 (empty -> .)
-    BREAK           reduce using rule 72 (empty -> .)
-    CONTINUE        reduce using rule 72 (empty -> .)
-    IF              reduce using rule 72 (empty -> .)
-    WHILE           reduce using rule 72 (empty -> .)
-    FOR             reduce using rule 72 (empty -> .)
-    VOID            reduce using rule 72 (empty -> .)
-    STRUCT          reduce using rule 72 (empty -> .)
-    INT             reduce using rule 72 (empty -> .)
-    FLOAT           reduce using rule 72 (empty -> .)
-    STRING_TYPE     reduce using rule 72 (empty -> .)
-    NOT             reduce using rule 72 (empty -> .)
-    MINUS           reduce using rule 72 (empty -> .)
-    LPAREN          reduce using rule 72 (empty -> .)
-    NUMBER          reduce using rule 72 (empty -> .)
-    STRLIT          reduce using rule 72 (empty -> .)
-    $end            reduce using rule 72 (empty -> .)
-    RBRACE          reduce using rule 72 (empty -> .)
+    ELIF            shift and go to state 149
+    ELSE            shift and go to state 150
+    ID              reduce using rule 74 (empty -> .)
+    RETURN          reduce using rule 74 (empty -> .)
+    BREAK           reduce using rule 74 (empty -> .)
+    CONTINUE        reduce using rule 74 (empty -> .)
+    IF              reduce using rule 74 (empty -> .)
+    WHILE           reduce using rule 74 (empty -> .)
+    FOR             reduce using rule 74 (empty -> .)
+    VOID            reduce using rule 74 (empty -> .)
+    STRUCT          reduce using rule 74 (empty -> .)
+    INT             reduce using rule 74 (empty -> .)
+    FLOAT           reduce using rule 74 (empty -> .)
+    STRING_TYPE     reduce using rule 74 (empty -> .)
+    BANG            reduce using rule 74 (empty -> .)
+    NOT             reduce using rule 74 (empty -> .)
+    MINUS           reduce using rule 74 (empty -> .)
+    LPAREN          reduce using rule 74 (empty -> .)
+    NUMBER          reduce using rule 74 (empty -> .)
+    STRLIT          reduce using rule 74 (empty -> .)
+    $end            reduce using rule 74 (empty -> .)
+    RBRACE          reduce using rule 74 (empty -> .)
 
-    else_block                     shift and go to state 144
-    empty                          shift and go to state 147
+    else_block                     shift and go to state 148
+    empty                          shift and go to state 151
 
-state 136
+state 140
 
     (29) elif_chain -> empty .
 
@@ -3097,6 +3417,7 @@ state 136
     INT             reduce using rule 29 (elif_chain -> empty .)
     FLOAT           reduce using rule 29 (elif_chain -> empty .)
     STRING_TYPE     reduce using rule 29 (elif_chain -> empty .)
+    BANG            reduce using rule 29 (elif_chain -> empty .)
     NOT             reduce using rule 29 (elif_chain -> empty .)
     MINUS           reduce using rule 29 (elif_chain -> empty .)
     LPAREN          reduce using rule 29 (elif_chain -> empty .)
@@ -3106,7 +3427,7 @@ state 136
     RBRACE          reduce using rule 29 (elif_chain -> empty .)
 
 
-state 137
+state 141
 
     (50) block -> LBRACE statement_list . RBRACE
     (2) statement_list -> statement_list . statement
@@ -3148,20 +3469,22 @@ state 137
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    RBRACE          shift and go to state 148
+    RBRACE          shift and go to state 152
     ID              shift and go to state 16
     RETURN          shift and go to state 18
     BREAK           shift and go to state 19
@@ -3174,13 +3497,14 @@ state 137
     INT             shift and go to state 27
     FLOAT           shift and go to state 28
     STRING_TYPE     shift and go to state 29
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    statement                      shift and go to state 34
+    statement                      shift and go to state 35
     decl_stmt                      shift and go to state 4
     assign_stmt                    shift and go to state 5
     return_stmt                    shift and go to state 6
@@ -3195,7 +3519,7 @@ state 137
     type_spec                      shift and go to state 15
     expr                           shift and go to state 17
 
-state 138
+state 142
 
     (51) block -> LBRACE RBRACE .
 
@@ -3213,6 +3537,7 @@ state 138
     INT             reduce using rule 51 (block -> LBRACE RBRACE .)
     FLOAT           reduce using rule 51 (block -> LBRACE RBRACE .)
     STRING_TYPE     reduce using rule 51 (block -> LBRACE RBRACE .)
+    BANG            reduce using rule 51 (block -> LBRACE RBRACE .)
     NOT             reduce using rule 51 (block -> LBRACE RBRACE .)
     MINUS           reduce using rule 51 (block -> LBRACE RBRACE .)
     LPAREN          reduce using rule 51 (block -> LBRACE RBRACE .)
@@ -3222,25 +3547,25 @@ state 138
     RBRACE          reduce using rule 51 (block -> LBRACE RBRACE .)
 
 
-state 139
+state 143
 
     (33) for_stmt -> FOR LPAREN for_init SEMI expr SEMI . assign_stmt RPAREN block
     (18) assign_stmt -> . ID ASSIGN expr
     (19) assign_stmt -> . ID DOT ID ASSIGN expr
     (20) assign_stmt -> . ID LBRACKET expr RBRACKET ASSIGN expr
 
-    ID              shift and go to state 150
+    ID              shift and go to state 154
 
-    assign_stmt                    shift and go to state 149
+    assign_stmt                    shift and go to state 153
 
-state 140
+state 144
 
     (20) assign_stmt -> ID LBRACKET expr RBRACKET . ASSIGN expr
 
-    ASSIGN          shift and go to state 120
+    ASSIGN          shift and go to state 124
 
 
-state 141
+state 145
 
     (36) func_def -> VOID ID LPAREN param_list RPAREN block .
 
@@ -3256,6 +3581,7 @@ state 141
     INT             reduce using rule 36 (func_def -> VOID ID LPAREN param_list RPAREN block .)
     FLOAT           reduce using rule 36 (func_def -> VOID ID LPAREN param_list RPAREN block .)
     STRING_TYPE     reduce using rule 36 (func_def -> VOID ID LPAREN param_list RPAREN block .)
+    BANG            reduce using rule 36 (func_def -> VOID ID LPAREN param_list RPAREN block .)
     NOT             reduce using rule 36 (func_def -> VOID ID LPAREN param_list RPAREN block .)
     MINUS           reduce using rule 36 (func_def -> VOID ID LPAREN param_list RPAREN block .)
     LPAREN          reduce using rule 36 (func_def -> VOID ID LPAREN param_list RPAREN block .)
@@ -3265,7 +3591,7 @@ state 141
     RBRACE          reduce using rule 36 (func_def -> VOID ID LPAREN param_list RPAREN block .)
 
 
-state 142
+state 146
 
     (46) struct_def -> STRUCT ID LBRACE struct_body RBRACE SEMI .
 
@@ -3281,6 +3607,7 @@ state 142
     INT             reduce using rule 46 (struct_def -> STRUCT ID LBRACE struct_body RBRACE SEMI .)
     FLOAT           reduce using rule 46 (struct_def -> STRUCT ID LBRACE struct_body RBRACE SEMI .)
     STRING_TYPE     reduce using rule 46 (struct_def -> STRUCT ID LBRACE struct_body RBRACE SEMI .)
+    BANG            reduce using rule 46 (struct_def -> STRUCT ID LBRACE struct_body RBRACE SEMI .)
     NOT             reduce using rule 46 (struct_def -> STRUCT ID LBRACE struct_body RBRACE SEMI .)
     MINUS           reduce using rule 46 (struct_def -> STRUCT ID LBRACE struct_body RBRACE SEMI .)
     LPAREN          reduce using rule 46 (struct_def -> STRUCT ID LBRACE struct_body RBRACE SEMI .)
@@ -3290,14 +3617,14 @@ state 142
     RBRACE          reduce using rule 46 (struct_def -> STRUCT ID LBRACE struct_body RBRACE SEMI .)
 
 
-state 143
+state 147
 
     (48) struct_body -> struct_body type_spec ID . SEMI
 
-    SEMI            shift and go to state 151
+    SEMI            shift and go to state 155
 
 
-state 144
+state 148
 
     (26) if_stmt -> IF LPAREN expr RPAREN block elif_chain else_block .
 
@@ -3313,6 +3640,7 @@ state 144
     INT             reduce using rule 26 (if_stmt -> IF LPAREN expr RPAREN block elif_chain else_block .)
     FLOAT           reduce using rule 26 (if_stmt -> IF LPAREN expr RPAREN block elif_chain else_block .)
     STRING_TYPE     reduce using rule 26 (if_stmt -> IF LPAREN expr RPAREN block elif_chain else_block .)
+    BANG            reduce using rule 26 (if_stmt -> IF LPAREN expr RPAREN block elif_chain else_block .)
     NOT             reduce using rule 26 (if_stmt -> IF LPAREN expr RPAREN block elif_chain else_block .)
     MINUS           reduce using rule 26 (if_stmt -> IF LPAREN expr RPAREN block elif_chain else_block .)
     LPAREN          reduce using rule 26 (if_stmt -> IF LPAREN expr RPAREN block elif_chain else_block .)
@@ -3322,26 +3650,26 @@ state 144
     RBRACE          reduce using rule 26 (if_stmt -> IF LPAREN expr RPAREN block elif_chain else_block .)
 
 
-state 145
+state 149
 
     (27) elif_chain -> elif_chain ELIF . LPAREN expr RPAREN block
 
-    LPAREN          shift and go to state 152
+    LPAREN          shift and go to state 156
 
 
-state 146
+state 150
 
     (28) elif_chain -> elif_chain ELSE . IF LPAREN expr RPAREN block
     (30) else_block -> ELSE . block
     (50) block -> . LBRACE statement_list RBRACE
     (51) block -> . LBRACE RBRACE
 
-    IF              shift and go to state 153
-    LBRACE          shift and go to state 124
+    IF              shift and go to state 157
+    LBRACE          shift and go to state 128
 
-    block                          shift and go to state 154
+    block                          shift and go to state 158
 
-state 147
+state 151
 
     (31) else_block -> empty .
 
@@ -3357,6 +3685,7 @@ state 147
     INT             reduce using rule 31 (else_block -> empty .)
     FLOAT           reduce using rule 31 (else_block -> empty .)
     STRING_TYPE     reduce using rule 31 (else_block -> empty .)
+    BANG            reduce using rule 31 (else_block -> empty .)
     NOT             reduce using rule 31 (else_block -> empty .)
     MINUS           reduce using rule 31 (else_block -> empty .)
     LPAREN          reduce using rule 31 (else_block -> empty .)
@@ -3366,7 +3695,7 @@ state 147
     RBRACE          reduce using rule 31 (else_block -> empty .)
 
 
-state 148
+state 152
 
     (50) block -> LBRACE statement_list RBRACE .
 
@@ -3384,6 +3713,7 @@ state 148
     INT             reduce using rule 50 (block -> LBRACE statement_list RBRACE .)
     FLOAT           reduce using rule 50 (block -> LBRACE statement_list RBRACE .)
     STRING_TYPE     reduce using rule 50 (block -> LBRACE statement_list RBRACE .)
+    BANG            reduce using rule 50 (block -> LBRACE statement_list RBRACE .)
     NOT             reduce using rule 50 (block -> LBRACE statement_list RBRACE .)
     MINUS           reduce using rule 50 (block -> LBRACE statement_list RBRACE .)
     LPAREN          reduce using rule 50 (block -> LBRACE statement_list RBRACE .)
@@ -3393,25 +3723,25 @@ state 148
     RBRACE          reduce using rule 50 (block -> LBRACE statement_list RBRACE .)
 
 
-state 149
+state 153
 
     (33) for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt . RPAREN block
 
-    RPAREN          shift and go to state 155
+    RPAREN          shift and go to state 159
 
 
-state 150
+state 154
 
     (18) assign_stmt -> ID . ASSIGN expr
     (19) assign_stmt -> ID . DOT ID ASSIGN expr
     (20) assign_stmt -> ID . LBRACKET expr RBRACKET ASSIGN expr
 
-    ASSIGN          shift and go to state 42
-    DOT             shift and go to state 110
-    LBRACKET        shift and go to state 111
+    ASSIGN          shift and go to state 43
+    DOT             shift and go to state 114
+    LBRACKET        shift and go to state 115
 
 
-state 151
+state 155
 
     (48) struct_body -> struct_body type_spec ID SEMI .
 
@@ -3422,7 +3752,7 @@ state 151
     ID              reduce using rule 48 (struct_body -> struct_body type_spec ID SEMI .)
 
 
-state 152
+state 156
 
     (27) elif_chain -> elif_chain ELIF LPAREN . expr RPAREN block
     (52) expr -> . expr PLUS expr
@@ -3430,36 +3760,39 @@ state 152
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 156
+    expr                           shift and go to state 160
 
-state 153
+state 157
 
     (28) elif_chain -> elif_chain ELSE IF . LPAREN expr RPAREN block
 
-    LPAREN          shift and go to state 157
+    LPAREN          shift and go to state 161
 
 
-state 154
+state 158
 
     (30) else_block -> ELSE block .
 
@@ -3475,6 +3808,7 @@ state 154
     INT             reduce using rule 30 (else_block -> ELSE block .)
     FLOAT           reduce using rule 30 (else_block -> ELSE block .)
     STRING_TYPE     reduce using rule 30 (else_block -> ELSE block .)
+    BANG            reduce using rule 30 (else_block -> ELSE block .)
     NOT             reduce using rule 30 (else_block -> ELSE block .)
     MINUS           reduce using rule 30 (else_block -> ELSE block .)
     LPAREN          reduce using rule 30 (else_block -> ELSE block .)
@@ -3484,17 +3818,17 @@ state 154
     RBRACE          reduce using rule 30 (else_block -> ELSE block .)
 
 
-state 155
+state 159
 
     (33) for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN . block
     (50) block -> . LBRACE statement_list RBRACE
     (51) block -> . LBRACE RBRACE
 
-    LBRACE          shift and go to state 124
+    LBRACE          shift and go to state 128
 
-    block                          shift and go to state 158
+    block                          shift and go to state 162
 
-state 156
+state 160
 
     (27) elif_chain -> elif_chain ELIF LPAREN expr . RPAREN block
     (52) expr -> expr . PLUS expr
@@ -3502,22 +3836,24 @@ state 156
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RPAREN          shift and go to state 159
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    RPAREN          shift and go to state 163
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 157
+state 161
 
     (28) elif_chain -> elif_chain ELSE IF LPAREN . expr RPAREN block
     (52) expr -> . expr PLUS expr
@@ -3525,29 +3861,32 @@ state 157
     (54) expr -> . expr TIMES expr
     (55) expr -> . expr DIVIDE expr
     (56) expr -> . expr RELOP expr
-    (57) expr -> . expr LOGOP expr
-    (58) expr -> . expr AND expr
-    (59) expr -> . expr OR expr
-    (60) expr -> . NOT expr
-    (61) expr -> . MINUS expr
-    (62) expr -> . LPAREN expr RPAREN
-    (63) expr -> . ID LBRACKET expr RBRACKET
-    (64) expr -> . NUMBER
-    (65) expr -> . STRLIT
-    (66) expr -> . ID
-    (67) expr -> . ID DOT ID
-    (68) expr -> . ID LPAREN arg_list RPAREN
+    (57) expr -> . expr AND_OP expr
+    (58) expr -> . expr OR_OP expr
+    (59) expr -> . BANG expr
+    (60) expr -> . expr AND expr
+    (61) expr -> . expr OR expr
+    (62) expr -> . NOT expr
+    (63) expr -> . MINUS expr
+    (64) expr -> . LPAREN expr RPAREN
+    (65) expr -> . ID LBRACKET expr RBRACKET
+    (66) expr -> . NUMBER
+    (67) expr -> . STRLIT
+    (68) expr -> . ID
+    (69) expr -> . ID DOT ID
+    (70) expr -> . ID LPAREN arg_list RPAREN
 
-    NOT             shift and go to state 31
+    BANG            shift and go to state 31
+    NOT             shift and go to state 32
     MINUS           shift and go to state 30
     LPAREN          shift and go to state 22
-    ID              shift and go to state 55
-    NUMBER          shift and go to state 32
-    STRLIT          shift and go to state 33
+    ID              shift and go to state 57
+    NUMBER          shift and go to state 33
+    STRLIT          shift and go to state 34
 
-    expr                           shift and go to state 160
+    expr                           shift and go to state 164
 
-state 158
+state 162
 
     (33) for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block .
 
@@ -3563,6 +3902,7 @@ state 158
     INT             reduce using rule 33 (for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block .)
     FLOAT           reduce using rule 33 (for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block .)
     STRING_TYPE     reduce using rule 33 (for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block .)
+    BANG            reduce using rule 33 (for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block .)
     NOT             reduce using rule 33 (for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block .)
     MINUS           reduce using rule 33 (for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block .)
     LPAREN          reduce using rule 33 (for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block .)
@@ -3572,17 +3912,17 @@ state 158
     RBRACE          reduce using rule 33 (for_stmt -> FOR LPAREN for_init SEMI expr SEMI assign_stmt RPAREN block .)
 
 
-state 159
+state 163
 
     (27) elif_chain -> elif_chain ELIF LPAREN expr RPAREN . block
     (50) block -> . LBRACE statement_list RBRACE
     (51) block -> . LBRACE RBRACE
 
-    LBRACE          shift and go to state 124
+    LBRACE          shift and go to state 128
 
-    block                          shift and go to state 161
+    block                          shift and go to state 165
 
-state 160
+state 164
 
     (28) elif_chain -> elif_chain ELSE IF LPAREN expr . RPAREN block
     (52) expr -> expr . PLUS expr
@@ -3590,22 +3930,24 @@ state 160
     (54) expr -> expr . TIMES expr
     (55) expr -> expr . DIVIDE expr
     (56) expr -> expr . RELOP expr
-    (57) expr -> expr . LOGOP expr
-    (58) expr -> expr . AND expr
-    (59) expr -> expr . OR expr
+    (57) expr -> expr . AND_OP expr
+    (58) expr -> expr . OR_OP expr
+    (60) expr -> expr . AND expr
+    (61) expr -> expr . OR expr
 
-    RPAREN          shift and go to state 162
-    PLUS            shift and go to state 46
-    MINUS           shift and go to state 47
-    TIMES           shift and go to state 48
-    DIVIDE          shift and go to state 49
-    RELOP           shift and go to state 50
-    LOGOP           shift and go to state 51
-    AND             shift and go to state 52
-    OR              shift and go to state 53
+    RPAREN          shift and go to state 166
+    PLUS            shift and go to state 47
+    MINUS           shift and go to state 48
+    TIMES           shift and go to state 49
+    DIVIDE          shift and go to state 50
+    RELOP           shift and go to state 51
+    AND_OP          shift and go to state 52
+    OR_OP           shift and go to state 53
+    AND             shift and go to state 54
+    OR              shift and go to state 55
 
 
-state 161
+state 165
 
     (27) elif_chain -> elif_chain ELIF LPAREN expr RPAREN block .
 
@@ -3623,6 +3965,7 @@ state 161
     INT             reduce using rule 27 (elif_chain -> elif_chain ELIF LPAREN expr RPAREN block .)
     FLOAT           reduce using rule 27 (elif_chain -> elif_chain ELIF LPAREN expr RPAREN block .)
     STRING_TYPE     reduce using rule 27 (elif_chain -> elif_chain ELIF LPAREN expr RPAREN block .)
+    BANG            reduce using rule 27 (elif_chain -> elif_chain ELIF LPAREN expr RPAREN block .)
     NOT             reduce using rule 27 (elif_chain -> elif_chain ELIF LPAREN expr RPAREN block .)
     MINUS           reduce using rule 27 (elif_chain -> elif_chain ELIF LPAREN expr RPAREN block .)
     LPAREN          reduce using rule 27 (elif_chain -> elif_chain ELIF LPAREN expr RPAREN block .)
@@ -3632,17 +3975,17 @@ state 161
     RBRACE          reduce using rule 27 (elif_chain -> elif_chain ELIF LPAREN expr RPAREN block .)
 
 
-state 162
+state 166
 
     (28) elif_chain -> elif_chain ELSE IF LPAREN expr RPAREN . block
     (50) block -> . LBRACE statement_list RBRACE
     (51) block -> . LBRACE RBRACE
 
-    LBRACE          shift and go to state 124
+    LBRACE          shift and go to state 128
 
-    block                          shift and go to state 163
+    block                          shift and go to state 167
 
-state 163
+state 167
 
     (28) elif_chain -> elif_chain ELSE IF LPAREN expr RPAREN block .
 
@@ -3660,6 +4003,7 @@ state 163
     INT             reduce using rule 28 (elif_chain -> elif_chain ELSE IF LPAREN expr RPAREN block .)
     FLOAT           reduce using rule 28 (elif_chain -> elif_chain ELSE IF LPAREN expr RPAREN block .)
     STRING_TYPE     reduce using rule 28 (elif_chain -> elif_chain ELSE IF LPAREN expr RPAREN block .)
+    BANG            reduce using rule 28 (elif_chain -> elif_chain ELSE IF LPAREN expr RPAREN block .)
     NOT             reduce using rule 28 (elif_chain -> elif_chain ELSE IF LPAREN expr RPAREN block .)
     MINUS           reduce using rule 28 (elif_chain -> elif_chain ELSE IF LPAREN expr RPAREN block .)
     LPAREN          reduce using rule 28 (elif_chain -> elif_chain ELSE IF LPAREN expr RPAREN block .)

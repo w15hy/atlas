@@ -6,10 +6,9 @@ from compiler.lexer import errors, lexer, tokens
 
 # ------------------ PRECEDENCIA ------------------
 precedence = (
-    ("left", "OR"),
-    ("left", "AND"),
-    ("right", "NOT"),
-    ("left", "LOGOP"),
+    ("left", "OR", "OR_OP"),
+    ("left", "AND", "AND_OP"),
+    ("right", "NOT", "BANG"),
     ("left", "RELOP"),
     ("left", "PLUS", "MINUS"),
     ("left", "TIMES", "DIVIDE"),
@@ -161,32 +160,7 @@ def p_func_def_void(p):
 
 def p_func_def_typed(p):
     """func_def : type_spec ID LPAREN param_list RPAREN block"""
-    block = p[6]
-    if not _block_has_return(block):
-        errors.append(
-            f"\033[31mSEMANTIC:\033[0m Function '{p[2]}' with return type '{p[1]}' "
-            f"must have a return statement"
-        )
     p[0] = ("func_def", p[2], p[4], p[6], p[1])
-
-
-def _block_has_return(block):
-    """Revisa recursivamente si un bloque contiene al menos un return."""
-    if not block or block[0] != "block":
-        return False
-    stmts = block[1]
-    for stmt in stmts:
-        if stmt is None:
-            continue
-        if stmt[0] == "return":
-            return True
-        # Buscar dentro de bloques anidados
-        if stmt[0] in ("if", "while", "for"):
-            for part in stmt[1:]:
-                if isinstance(part, tuple) and part[0] == "block":
-                    if _block_has_return(part):
-                        return True
-    return False
 
 
 def p_param_list(p):
@@ -248,13 +222,19 @@ def p_block(p):
 
 
 def p_expr_binop(p):
-    """expr : expr PLUS   expr
-    | expr MINUS  expr
-    | expr TIMES  expr
-    | expr DIVIDE expr
-    | expr RELOP  expr
-    | expr LOGOP  expr"""
+    """expr : expr PLUS    expr
+    | expr MINUS   expr
+    | expr TIMES   expr
+    | expr DIVIDE  expr
+    | expr RELOP   expr
+    | expr AND_OP  expr
+    | expr OR_OP   expr"""
     p[0] = ("binop", p[2], p[1], p[3])
+
+
+def p_expr_bang(p):
+    """expr : BANG expr"""
+    p[0] = ("unop", "!", p[2])
 
 
 def p_expr_and(p):

@@ -258,12 +258,34 @@ class SemanticAnalyzer:
         self._loop_depth -= 1
         self.table.exit_scope()
 
+    @staticmethod
+    def _block_has_return(block):
+        if not block or block[0] != "block":
+            return False
+        for stmt in block[1]:
+            if stmt is None:
+                continue
+            if stmt[0] == "return":
+                return True
+            if stmt[0] in ("if", "while", "for"):
+                for part in stmt[1:]:
+                    if isinstance(part, tuple) and part[0] == "block":
+                        if SemanticAnalyzer._block_has_return(part):
+                            return True
+        return False
+
     def _stmt_func_def(self, stmt):
         _, name, params, block, ret_type = stmt
         fsym = self.table.lookup_function(name)
         if fsym is None:
             # Pudo haber fallado en la pasada de cabeceras por redefinición; no se reintenta.
             return
+        resolved_ret = fsym.extra.get("ret_type", VOID)
+        if resolved_ret != VOID and not self._block_has_return(block):
+            self._error(
+                f"función '{name}' con tipo de retorno '{type_name(resolved_ret)}' "
+                f"no tiene sentencia return"
+            )
         self.table.enter_scope()
         for ptype, pname in fsym.extra.get("params", []):
             if not self.table.declare(Symbol(pname, "param", ptype)):

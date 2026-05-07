@@ -42,7 +42,9 @@ tokens = [
     "STRLIT",
     "ASSIGN",
     "RELOP",
-    "LOGOP",
+    "AND_OP",
+    "OR_OP",
+    "BANG",
     "LPAREN",
     "RPAREN",
     "LBRACKET",
@@ -113,8 +115,18 @@ def t_RELOP(t):
     return t
 
 
-def t_LOGOP(t):
-    r"&&|\|\||!"
+def t_AND_OP(t):
+    r"&&"
+    return t
+
+
+def t_OR_OP(t):
+    r"\|\|"
+    return t
+
+
+def t_BANG(t):
+    r"!"
     return t
 
 
@@ -145,6 +157,15 @@ lexer = lex.lex()
 
 
 # ------------------ API PÚBLICA ------------------
+def reset():
+    """Limpia el estado global del lexer entre compilaciones."""
+    symbol_table.clear()
+    number_table.clear()
+    string_table.clear()
+    errors.clear()
+    lexer.lineno = 1
+
+
 def lexer_output(source: str):
     tokens_list = []
     lexer.input(source)

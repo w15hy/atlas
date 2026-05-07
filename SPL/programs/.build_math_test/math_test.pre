@@ -1,0 +1,165 @@
+# ============================================================================
+# stdlib/math.atl — Biblioteca matemática estándar de Atlas SPL
+# ============================================================================
+# Reemplaza y unifica:  gcd_lib.asm  +  power_lib.asm
+#
+# Uso:
+#     #include <math.atl>
+#
+# Funciones provistas (todas operan sobre enteros de 8 bytes / 64 bits):
+#     int abs(int x)
+#     int sign(int x)
+#     int min(int a, int b)
+#     int max(int a, int b)
+#     int clamp(int x, int lo, int hi)
+#     int mod(int a, int b)
+#     int is_even(int x)
+#     int is_odd(int x)
+#     int gcd(int a, int b)
+#     int lcm(int a, int b)
+#     int power(int base, int exp)
+#     int isqrt(int n)
+#     int factorial(int n)
+# ============================================================================
+int abs(int x) {
+    if (x < 0) {
+        return -x;
+    }
+    return x;
+}
+int sign(int x) {
+    if (x > 0) {
+        return 1;
+    }
+    if (x < 0) {
+        return -1;
+    }
+    return 0;
+}
+int min(int a, int b) {
+    if (a < b) {
+        return a;
+    }
+    return b;
+}
+int max(int a, int b) {
+    if (a > b) {
+        return a;
+    }
+    return b;
+}
+int clamp(int x, int lo, int hi) {
+    if (x < lo) {
+        return lo;
+    }
+    if (x > hi) {
+        return hi;
+    }
+    return x;
+}
+# Resto entero a - (a/b)*b. Devuelve 0 si b == 0.
+int mod(int a, int b) {
+    if (b == 0) {
+        return 0;
+    }
+    return a - (a / b) * b;
+}
+int is_even(int x) {
+    return mod(x, 2) == 0;
+}
+int is_odd(int x) {
+    return mod(x, 2) != 0;
+}
+# Máximo común divisor — algoritmo de Euclides iterativo.
+int gcd(int a, int b) {
+    int x = a;
+    int y = b;
+    if (x < 0) {
+        x = -x;
+    }
+    if (y < 0) {
+        y = -y;
+    }
+    while (y != 0) {
+        int t = mod(x, y);
+        x = y;
+        y = t;
+    }
+    return x;
+}
+# Mínimo común múltiplo. Devuelve 0 si alguno es 0.
+int lcm(int a, int b) {
+    if (a == 0 || b == 0) {
+        return 0;
+    }
+    int g = gcd(a, b);
+    int prod = a * b;
+    if (prod < 0) {
+        prod = -prod;
+    }
+    return prod / g;
+}
+# Exponenciación rápida (binary exponentiation). exp negativo => 0.
+int power(int base, int exp) {
+    if (exp < 0) {
+        return 0;
+    }
+    int result = 1;
+    int b = base;
+    int e = exp;
+    while (e > 0) {
+        if (is_odd(e)) {
+            result = result * b;
+        }
+        b = b * b;
+        e = e / 2;
+    }
+    return result;
+}
+# Raíz cuadrada entera por el método de Newton. n < 0 => 0.
+int isqrt(int n) {
+    if (n <= 0) {
+        return 0;
+    }
+    int x = n;
+    int y = (x + 1) / 2;
+    while (y < x) {
+        x = y;
+        y = (x + n / x) / 2;
+    }
+    return x;
+}
+# Factorial iterativo. n <= 1 => 1.
+int factorial(int n) {
+    if (n <= 1) {
+        return 1;
+    }
+    int result = 1;
+    int i = 2;
+    while (i <= n) {
+        result = result * i;
+        i = i + 1;
+    }
+    return result;
+}
+int main() {
+    print(abs(-7));         # 7
+    print(sign(-3));        # -1
+    print(sign(0));         # 0
+    print(sign(5));         # 1
+    print(min(3, 7));       # 3
+    print(max(3, 7));       # 7
+    print(clamp(15, 0, 10));# 10
+    print(clamp(-2, 0, 10));# 0
+    print(mod(17, 5));      # 2
+    print(is_even(4));      # 1
+    print(is_odd(7));       # 1
+    print(gcd(48, 18));     # 6
+    print(lcm(4, 6));       # 12
+    print(power(2, 10));    # 1024
+    print(power(3, 7));     # 2187
+    print(isqrt(50));       # 7
+    print(isqrt(100));      # 10
+    print(factorial(5));    # 120
+    return 0;
+}

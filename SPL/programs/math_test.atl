@@ -1,0 +1,23 @@
+#include <math.atl>
+
+int main() {
+    print(abs(-7));         # 7
+    print(sign(-3));        # -1
+    print(sign(0));         # 0
+    print(sign(5));         # 1
+    print(min(3, 7));       # 3
+    print(max(3, 7));       # 7
+    print(clamp(15, 0, 10));# 10
+    print(clamp(-2, 0, 10));# 0
+    print(mod(17, 5));      # 2
+    print(is_even(4));      # 1
+    print(is_odd(7));       # 1
+    print(gcd(48, 18));     # 6
+    print(lcm(4, 6));       # 12
+    print(power(2, 10));    # 1024
+    print(power(3, 7));     # 2187
+    print(isqrt(50));       # 7
+    print(isqrt(100));      # 10
+    print(factorial(5));    # 120
+    return 0;
+}

@@ -16,8 +16,11 @@ _SPL_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SPL_DIR not in sys.path:
     sys.path.insert(0, _SPL_DIR)
 
+# Directorio de la stdlib (atlas/stdlib). Los #include <...> se buscan ahí.
+_STDLIB_DIR = os.path.abspath(os.path.join(_SPL_DIR, "..", "stdlib"))
+
 from preprocessor.preprocessor import preprocessor
-from compiler.lexer import lexer_output
+from compiler.lexer import lexer_output, reset as lexer_reset
 from compiler.parser import parse
 from compiler.analyzer import analyze_and_generate
 import assembler
@@ -39,13 +42,14 @@ def run(atl_path):
     # ── 1. Preprocesador ─────────────────────────────────────────────────
     print(f"[1/4] Preprocesando  {os.path.basename(atl_path)}")
     lines    = ofilelines(atl_path)
-    pre_lines = preprocessor(lines, base_dir=atl_dir)
+    pre_lines = preprocessor(lines, base_dir=atl_dir, stdlib_dir=_STDLIB_DIR)
     pre_path  = os.path.join(build_dir, f"{basename}.pre")
     wfilelines(pre_path, pre_lines)
 
     # ── 2. Lexer + Parser ────────────────────────────────────────────────
     print(f"[2/4] Compilando     {basename}.pre -> AST")
     source = ofile(pre_path)
+    lexer_reset()
 
     tok_str, _, _, _ = lexer_output(source)
     wfilelines(os.path.join(build_dir, f"{basename}.tokens"), tok_str)

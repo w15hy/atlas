@@ -250,9 +250,11 @@ def cmp(cpu, registros, ram):
     _, rd, r1, _, _ = _parse_fmt1(registros)
     vd, v1 = registros.get_reg(rd), registros.get_reg(r1)
     result = vd - v1
-    registros.flag_Z = result == 0
-    registros.flag_N = result < 0
-    registros.flag_C = vd < v1
+    # Usa update_flags para que flag_N se derive del bit de signo (MSB)
+    # del resultado truncado a REG_BITS, no de Python int. Antes flag_N se
+    # calculaba como (result < 0) sobre valores unsigned, lo que rompía
+    # comparaciones con negativos (e.g., x < 0 era siempre falso).
+    registros.update_flags(result, operand_a=vd, operand_b=v1, operation="sub")
     return False
 
 
@@ -265,9 +267,14 @@ def test(cpu, registros, ram):
 
 
 def out_(cpu, registros, ram):
-    """out rd — muestra el valor del registro rd por el dispositivo de salida."""
+    """out rd — muestra el valor del registro rd por el dispositivo de salida.
+    Si el bit de signo (MSB) está puesto, se imprime como entero con signo de
+    64 bits (two's complement); en otro caso, como entero sin signo.
+    """
     _, rd, _, _, _ = _parse_fmt1(registros)
     val = registros.get_reg(rd)
+    if val >> 63:
+        val = val - (1 << 64)
     print(f"[OUT] R{rd} = {val}")
     return False
 

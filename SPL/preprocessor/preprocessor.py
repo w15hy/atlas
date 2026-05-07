@@ -8,10 +8,12 @@ from preprocessor.macros import (
 )
 
 
-def preprocessor(lines, base_dir="."):
+def preprocessor(lines, base_dir=".", stdlib_dir=None):
+    # Resetea el estado global de macros entre compilaciones.
+    dict_macros.clear()
 
     # ---------------- INCLUDE ----------------
-    lines = include(lines, base_dir=base_dir)
+    lines = include(lines, base_dir=base_dir, stdlib_dir=stdlib_dir)
     # ---------------- MACROS ----------------
     define_macros(lines)
 
