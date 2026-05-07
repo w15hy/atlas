@@ -33,6 +33,7 @@ INSTR_DICT = {
     "mod": {"opcode": 25, "formato": 1},
     "modi": {"opcode": 26, "formato": 1},
     "out": {"opcode": 27, "formato": 1},
+    "outs": {"opcode": 28, "formato": 1},
     "load": {"opcode": 0, "formato": 2},
     "store": {"opcode": 1, "formato": 2},
     "lea": {"opcode": 2, "formato": 2},
@@ -95,6 +96,46 @@ FLOAT_RE = re.compile(
     r'^-?[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?$|^-?[0-9]+[eE][+-]?[0-9]+$'
 )
 REGISTER_RE = re.compile(r'^[rR](1[0-5]|[0-9])$')
+
+# Directivas de datos: emiten bytes crudos (líneas de 8 bits) en el .binReloc.
+# .fill <n> [, <byte>]  -> n bytes con el valor indicado (default 0)
+# .byte <v>             -> 1 byte
+# .string "..."         -> chars ASCII + null + padding hasta múltiplo de 8 bytes
+FILL_RE = re.compile(r'^\s*\.fill\s+(\d+)\s*(?:,\s*(-?\d+))?\s*$', re.IGNORECASE)
+BYTE_RE = re.compile(r'^\s*\.byte\s+(-?\d+|0x[0-9a-fA-F]+)\s*$', re.IGNORECASE)
+STRING_RE = re.compile(r'^\s*\.string\s+"((?:[^"\\]|\\.)*)"\s*$', re.IGNORECASE)
+
+
+def _decode_string_literal(raw):
+    """Decode escape sequences (\\n, \\t, \\\\, \\\", \\0) within a .string operand."""
+    result = []
+    i = 0
+    while i < len(raw):
+        ch = raw[i]
+        if ch == '\\' and i + 1 < len(raw):
+            nxt = raw[i + 1]
+            mapping = {
+                'n': '\n', 't': '\t', 'r': '\r',
+                '\\': '\\', '"': '"', '\'': '\'',
+                '0': '\x00',
+            }
+            result.append(mapping.get(nxt, nxt))
+            i += 2
+        else:
+            result.append(ch)
+            i += 1
+    return ''.join(result)
+
+
+def _string_directive_bytes(content):
+    """Convert the decoded string content into the raw byte list that the
+    directive emits. Always appends a null terminator and pads up to an
+    8-byte boundary so consecutive strings remain word-aligned."""
+    data = [ord(ch) & 0xFF for ch in content]
+    data.append(0)  # null terminator
+    while len(data) % 8 != 0:
+        data.append(0)
+    return data
 
 
 def zfill_bin(number, bits):
@@ -227,6 +268,23 @@ def clean_instruction_line(line):
     return stripped or None
 
 
+def _directive_byte_count(stripped):
+    """Return the number of raw bytes a data directive emits, or None if the
+    line is not a recognised data directive."""
+    fill_match = FILL_RE.match(stripped)
+    if fill_match:
+        return int(fill_match.group(1))
+
+    if BYTE_RE.match(stripped):
+        return 1
+
+    string_match = STRING_RE.match(stripped)
+    if string_match:
+        return len(_string_directive_bytes(_decode_string_literal(string_match.group(1))))
+
+    return None
+
+
 def first_pass(lines):
     """Map labels to byte addresses because the VM PC advances 8 bytes per instruction."""
     labels = {}
@@ -259,6 +317,12 @@ def first_pass(lines):
                 stripped = remainder.strip()
                 if not stripped:
                     continue
+
+        # Data directives ocupan un número variable de bytes (1 byte por línea).
+        directive_size = _directive_byte_count(stripped)
+        if directive_size is not None:
+            current_address += directive_size
+            continue
 
         current_address += 8
 
@@ -495,14 +559,18 @@ def is_numeric_token(token):
         return is_float_token(token)
 
 
-def build_instruction(instruction, labels, instruction_index):
-    """Encode one instruction and emit relocation metadata when needed."""
+def build_instruction(instruction, labels, byte_address):
+    """Encode one instruction and emit relocation metadata when needed.
+
+    `byte_address` is the byte offset at which this 64-bit instruction will
+    live in the output (used for relative jumps that need pc-relative offsets).
+    """
     mnemonic = instruction['mnemonic']
     operands = instruction['operands']
     info = INSTR_DICT[mnemonic]
     instruction_format = info['formato']
     opcode = info['opcode']
-    current_address = instruction_index * 8
+    current_address = byte_address
 
     prepared_operands = []
     relocation_target = None
@@ -531,12 +599,34 @@ def build_instruction(instruction, labels, instruction_index):
     if relocation_target is not None:
         bits = inject_placeholder(bits, instruction_format, relocation_target)
         relocation_entry = {
-            'source_index': instruction_index,
+            # source_index is filled in by translate() once the line index
+            # in the output is known (there can be raw-byte data lines mixed
+            # in, so the byte address alone is no longer the line index).
             'target_index': relocation_target,
             'format': instruction_format,
         }
 
     return bits, relocation_entry
+
+
+def _parse_data_directive(stripped):
+    """If `stripped` is a data directive (.fill / .byte / .string), return
+    the list of byte values it expands to. Otherwise return None."""
+    fill_match = FILL_RE.match(stripped)
+    if fill_match:
+        count = int(fill_match.group(1))
+        value = int(fill_match.group(2)) if fill_match.group(2) else 0
+        return [value & 0xFF] * count
+
+    byte_match = BYTE_RE.match(stripped)
+    if byte_match:
+        return [int(byte_match.group(1), 0) & 0xFF]
+
+    string_match = STRING_RE.match(stripped)
+    if string_match:
+        return _string_directive_bytes(_decode_string_literal(string_match.group(1)))
+
+    return None
 
 
 def parse(input_path):
@@ -551,10 +641,16 @@ def parse(input_path):
     base_address, expanded_lines = extract_org(expanded_lines)
     labels = first_pass(expanded_lines)
 
-    instructions = []
+    items = []  # mezcla de instrucciones y bloques de datos en orden de aparición
     for line in expanded_lines:
         instruction_text = clean_instruction_line(line)
         if instruction_text is None:
+            continue
+
+        # Directivas de datos: emiten bytes crudos sin opcode.
+        data_bytes = _parse_data_directive(instruction_text)
+        if data_bytes is not None:
+            items.append({'kind': 'data', 'bytes': data_bytes})
             continue
 
         parts = [part for part in re.split(r'[\s,]+', instruction_text) if part]
@@ -564,8 +660,9 @@ def parse(input_path):
         if mnemonic not in INSTR_DICT:
             raise ValueError(f"Unknown instruction: {mnemonic}")
 
-        instructions.append(
+        items.append(
             {
+                'kind': 'instr',
                 'mnemonic': mnemonic,
                 'operands': operands,
                 'raw': instruction_text,
@@ -576,24 +673,36 @@ def parse(input_path):
         'input_path': input_path,
         'base_address': base_address,
         'labels': labels,
-        'instructions': instructions,
+        'items': items,
     }
 
 
 def translate(parsed_program):
-    """Convert parsed instructions into binary text plus relocation entries."""
+    """Convert parsed instructions and data into binary text plus relocations."""
     binary_lines = []
     relocations = []
+    byte_address = 0  # offset en bytes desde el inicio del programa
 
-    for instruction_index, instruction in enumerate(parsed_program['instructions']):
+    for item in parsed_program['items']:
+        if item['kind'] == 'data':
+            for byte_value in item['bytes']:
+                binary_lines.append(format(byte_value & 0xFF, '08b'))
+                byte_address += 1
+            continue
+
         bits, relocation_entry = build_instruction(
-            instruction,
+            item,
             parsed_program['labels'],
-            instruction_index,
+            byte_address,
         )
-        binary_lines.append(bits)
         if relocation_entry is not None:
+            # source_index ahora es el índice de línea en binary_lines
+            # (no en bytes), porque las directivas de datos producen líneas
+            # de 8 bits y las instrucciones líneas de 64 bits.
+            relocation_entry['source_index'] = len(binary_lines)
             relocations.append(relocation_entry)
+        binary_lines.append(bits)
+        byte_address += 8
 
     return {
         'base_address': parsed_program['base_address'],

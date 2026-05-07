@@ -1,0 +1,10 @@
+int main() {
+    string greeting = "Hola, Atlas!";
+    string lang = "Atlas SPL";
+    print(greeting);
+    print(lang);
+    print("literal anonimo");
+    int x = 42;
+    print(x);
+    return 0;
+}

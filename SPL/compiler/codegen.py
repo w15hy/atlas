@@ -55,6 +55,7 @@ _DS_PAT = re.compile(r'__DS_(\d+)__')   # string region
 # Replica exacta de los patrones que usa first_pass() en el ensamblador
 # para distinguir instrucciones de comentarios / etiquetas / directivas.
 _ORG_RE = re.compile(r'^\s*\.org\s+(\d+)\s*(?:#.*)?$', re.IGNORECASE)
+_DATA_DIR_RE = re.compile(r'^\s*\.(fill|byte|string)\b', re.IGNORECASE)
 _LABEL_ID_RE = re.compile(r'[A-Za-z_]\w*')
 
 
@@ -145,14 +146,37 @@ class CodeGenerator:
                 )
                 break
 
-        # ---------- tabla de strings (informativa) ----------
+        # ---------- emisión de la región de datos (zero-init) ----------
+        # Las directivas .fill / .string que siguen producen bytes crudos en
+        # el .binReloc; gracias a ellas las cadenas terminan en RAM en la
+        # dirección absoluta calculada arriba (str_base + offset).
+        # Se emiten DESPUÉS de _resolve_addresses para que esas líneas no
+        # cuenten como instrucciones de 8 bytes en _count_instructions.
+        if self._next_data_offset > 0:
+            self._emit("")
+            self._comment("-" * 72)
+            self._comment(f" Sección de datos (variables)  [{data_base}..{str_base})")
+            self._comment("-" * 72)
+            self._emit(f"    .fill {self._next_data_offset}")
+
+        # ---------- emisión de la región de strings ----------
         if self.string_pool:
-            self._comment("")
+            self._emit("")
             self._comment("-" * 72)
-            self._comment(" Tabla de strings (direcciones absolutas)")
+            self._comment(f" Sección de strings  [{str_base}..)")
             self._comment("-" * 72)
-            for s, offset in self.string_pool.items():
+            # Recorrer el pool en orden de offset para mantener la
+            # correspondencia con __DS_<offset>__.
+            for s, offset in sorted(self.string_pool.items(), key=lambda kv: kv[1]):
+                escaped = (
+                    s.replace('\\', '\\\\')
+                     .replace('"', '\\"')
+                     .replace('\n', '\\n')
+                     .replace('\t', '\\t')
+                     .replace('\r', '\\r')
+                )
                 self._comment(f"  [{str_base + offset}] = {s!r}")
+                self._emit(f'    .string "{escaped}"')
 
         return "\n".join(self.lines) + "\n"
 
@@ -181,6 +205,10 @@ class CodeGenerator:
                     remainder = parts[1].strip()
                     if not remainder:
                         continue
+                    stripped = remainder
+            # Las directivas de datos no son instrucciones; emiten bytes.
+            if _DATA_DIR_RE.match(stripped):
+                continue
             count += 1
         return count
 
@@ -612,7 +640,14 @@ class CodeGenerator:
         if name in ("print", "out"):
             for a in args:
                 ra = self._gen_expr(a)
-                self._emit(f"    out R{ra}    # print")
+                # Si el argumento es un string el registro contiene una
+                # dirección al pool de strings; usamos outs para imprimir
+                # la cadena ASCII en lugar del valor numérico del puntero.
+                a_type = self.types.get(id(a))
+                if a_type == STRING:
+                    self._emit(f"    outs R{ra}    # print string")
+                else:
+                    self._emit(f"    out R{ra}    # print")
                 self._free_reg(ra)
             r = self._alloc_reg()
             self._emit(f"    mov R{r}, 0")

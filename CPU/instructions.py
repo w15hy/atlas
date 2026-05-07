@@ -272,6 +272,27 @@ def out_(cpu, registros, ram):
     return False
 
 
+def outs(cpu, registros, ram):
+    """outs rd — imprime la cadena ASCII almacenada en RAM a partir de la
+    dirección contenida en rd, hasta encontrar un byte 0 (null terminator).
+    """
+    _, rd, _, _, _ = _parse_fmt1(registros)
+    addr = registros.get_reg(rd) & ADDR_MASK
+    chars = []
+    # Cap defensivo para evitar bucles infinitos si la cadena no está
+    # null-terminada (la región de strings se zero-rellena, así que esto
+    # solo activa si el puntero está fuera del pool de strings).
+    for _ in range(4096):
+        byte_str = ram.read(addr)
+        val = int(byte_str, 2)
+        if val == 0:
+            break
+        chars.append(chr(val))
+        addr += 1
+    print(f"[OUT] \"{''.join(chars)}\"")
+    return False
+
+
 # ---------------------------------------------------------------------------
 # F2 — Memoria
 # ---------------------------------------------------------------------------
@@ -659,6 +680,7 @@ _F1 = {
     25: mod,
     26: modi,
     27: out_,
+    28: outs,
 }
 
 _F2 = {0: load, 1: store, 2: lea, 3: loadw, 4: storew}
