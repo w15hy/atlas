@@ -16,14 +16,16 @@ API pública:
 from compiler import codegen, semantic
 
 
-def analyze_and_generate(ast):
+def analyze_and_generate(ast, *, org=0):
     sa = semantic.SemanticAnalyzer()
     annotated_ast, table, errors = sa.analyze(ast)
 
     asm_text = None
     if not errors:
         try:
-            asm_text = codegen.generate(annotated_ast, table, sa.type_annotations)
+            asm_text = codegen.generate(
+                annotated_ast, table, sa.type_annotations, org=org
+            )
         except codegen.CodeGenError as e:
             errors.append(f"\033[31mCODEGEN:\033[0m {e}")
 

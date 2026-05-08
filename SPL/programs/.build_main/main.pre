@@ -273,6 +273,7 @@ int main() {
         z = z + 0.5;
         continue;
     }
+	print(z+2);
     int a = 5 + 3 - 2 * 4 / 2;
     if ((a >= 0) and (a < 100)) {
         msg = "range";

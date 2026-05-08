@@ -12,7 +12,8 @@
       "Bash(grep -E \"^\\\\[OUT\\\\]|^[0-9]+\\\\.[0-9]+$\")",
       "Bash(cd SPL && python pipeline.py programs/vecmat_test.atl 2>&1 | tail -5 && cd .. && echo \"1\" | python main.py SPL/programs/.build_vecmat_test/vecmat_test.bin 2>&1 | grep -E \"^\\\\[OUT\\\\]|^[0-9]+\\\\.[0-9]+$\")",
       "Read(//c/Users/asdva/OneDrive/Documentos/Visual/Maquina/**)",
-      "Bash(python pipeline.py programs/__TRACKED_VAR__.atl)"
+      "Bash(python pipeline.py programs/__TRACKED_VAR__.atl)",
+      "Bash(python -c ' *)"
     ]
   }
 }

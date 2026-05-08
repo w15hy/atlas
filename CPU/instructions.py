@@ -623,6 +623,14 @@ def ff2i(cpu, registros, ram):
     return False
 
 
+def fout(cpu, registros, ram):
+    """fout rd — imprime el contenido de rd interpretado como float IEEE 754 de 64 bits."""
+    _, rd, _, _, _ = _parse_fmt1(registros)
+    val = _bits_to_float(registros.get_reg(rd))
+    print(f"[OUT] R{rd} = {val}")
+    return False
+
+
 def halt(cpu, registros, ram):
     print(_bits_to_float(registros.get_reg(14)))
     cpu.running = False
@@ -730,6 +738,7 @@ _F5 = {
     8: fsqrt,
     9: fi2f,
     10: ff2i,
+    11: fout,
 }
 
 DECODE_TABLE = {

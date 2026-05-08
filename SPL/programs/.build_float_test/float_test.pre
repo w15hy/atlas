@@ -1,0 +1,19 @@
+# Test de print(float).
+# Esperado:
+#   3.14
+#   2.5
+#   5.64
+#   0.64
+#   7.85
+#   1.256
+int main() {
+    float a = 3.14;
+    float b = 2.5;
+    print(a);
+    print(b);
+    print(a + b);
+    print(a - b);
+    print(a * b);
+    print(a / b);
+    return 0;
+}

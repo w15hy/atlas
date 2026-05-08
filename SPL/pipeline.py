@@ -28,7 +28,7 @@ import linker
 from utils import ofile, ofilelines, wfilelines
 
 
-def run(atl_path):
+def run(atl_path, *, org=0):
     atl_path = os.path.abspath(atl_path)
     if not os.path.exists(atl_path):
         print(f"[ERROR] Archivo no encontrado: {atl_path}")
@@ -62,8 +62,8 @@ def run(atl_path):
         return None
 
     # ── 3. Semántico + Codegen ───────────────────────────────────────────
-    print(f"[3/4] Generando      {basename}.asm")
-    result = analyze_and_generate(ast)
+    print(f"[3/4] Generando      {basename}.asm  (.org = {org})")
+    result = analyze_and_generate(ast, org=org)
     if result["errors"]:
         print("\n[ERROR] Semántico / Codegen:")
         for e in result["errors"]:

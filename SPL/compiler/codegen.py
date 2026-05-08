@@ -673,6 +673,8 @@ class CodeGenerator:
                 a_type = self.types.get(id(a))
                 if a_type == STRING:
                     self._emit(f"    outs R{ra}    # print string")
+                elif a_type == FLOAT:
+                    self._emit(f"    fout R{ra}    # print float")
                 else:
                     self._emit(f"    out R{ra}    # print")
                 self._free_reg(ra)

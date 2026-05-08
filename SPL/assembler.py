@@ -69,6 +69,7 @@ INSTR_DICT = {
     "fsqrt": {"opcode": 8, "formato": 5},
     "fi2f": {"opcode": 9, "formato": 5},
     "ff2i": {"opcode": 10, "formato": 5},
+    "fout": {"opcode": 11, "formato": 5},
 }
 
 PRE_INSTR = {

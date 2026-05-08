@@ -11,7 +11,7 @@
 # --- funcion main() ---
 main:
     mov R6, 160    # &"messi"
-    out R6    # print
+    outs R6    # print string
     mov R7, 0
     mov R8, 777
     mov R9, 888
@@ -27,8 +27,14 @@ main:
     mov R6, 0
     mov R0, R6    # valor de retorno
     ret
-# 
+
 # ------------------------------------------------------------------------
-#  Tabla de strings (direcciones absolutas)
+#  Sección de datos (variables)  [152..160)
+# ------------------------------------------------------------------------
+    .fill 8
+
+# ------------------------------------------------------------------------
+#  Sección de strings  [160..)
 # ------------------------------------------------------------------------
 #   [160] = 'messi'
+    .string "messi"
